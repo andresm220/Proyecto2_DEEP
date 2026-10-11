@@ -22,3 +22,9 @@ def test_hflip_only_flips():
     orig = ds.images[5].float() / 127.5 - 1
     assert all(torch.equal(o, orig) or torch.equal(o, orig.flip(-1)) for o in outs)
     assert any(torch.equal(o, orig.flip(-1)) for o in outs)
+
+
+def test_black_background():
+    ds = TinyHero("data", hflip=False, background=(0, 0, 0))
+    x, _ = ds[0]
+    assert x[:, 0, 0].tolist() == [-1.0, -1.0, -1.0]  # esquina = fondo

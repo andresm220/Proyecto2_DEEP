@@ -124,7 +124,9 @@ def main():
     set_seed(cfg["seed"])
 
     # ------------------------------------------------------------ datos
-    ds = TinyHero(args.data_root, image_size=cfg["image_size"], hflip=cfg["augment_hflip"])
+    # Fondo: "white" (por defecto) o "black". Negro = lo que guardan los PNG bajo alfa 0 (y lo que usó la autora).
+    background = {"white": (255, 255, 255), "black": (0, 0, 0)}[cfg.get("background", "white")]
+    ds = TinyHero(args.data_root, image_size=cfg["image_size"], hflip=cfg["augment_hflip"], background=background)
     loader_gen = torch.Generator().manual_seed(cfg["seed"])  # orden de barajado reproducible
     loader = DataLoader(
         ds, batch_size=cfg["batch_size"], shuffle=True, generator=loader_gen,
@@ -138,7 +140,7 @@ def main():
     G, D = G.to(device), D.to(device)
     optG = torch.optim.Adam(G.parameters(), lr=cfg["lr_g"], betas=tuple(cfg["betas"]))
     optD = torch.optim.Adam(D.parameters(), lr=cfg["lr_d"], betas=tuple(cfg["betas"]))
-    d_loss_fn, g_loss_fn = get_loss(cfg["loss"])
+    d_loss_fn, g_loss_fn = get_loss(cfg["loss"], cfg.get("label_noise", 0.0))
 
     # El MISMO ruido fijo para todos los runs: vive en <out-root>/fixed_noise.pt, no dentro del run.
     fixed_noise = get_fixed_noise(out_root / "fixed_noise.pt", cfg["n_fixed"], cfg["nz"],

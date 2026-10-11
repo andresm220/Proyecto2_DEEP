@@ -1,0 +1,4 @@
+# Prueba corta: solo etiquetas ruidosas (0.1) sobre el control.
+inherit: ../base.yaml
+name: probe_labelnoise
+label_noise: 0.1

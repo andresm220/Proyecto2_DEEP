@@ -23,3 +23,12 @@ def test_hinge_values_and_margin():
 def test_unknown_loss():
     with pytest.raises(ValueError):
         get_loss("wgan")
+
+
+def test_bce_label_noise_softens_targets():
+    from src.losses import bce_d_loss
+    torch.manual_seed(0)
+    big = torch.full((4096,), 20.0)
+    # Con objetivos 0/1 exactos, logits muy seguros dan pérdida ~0; con etiquetas ruidosas ya no.
+    assert bce_d_loss(big, -big).item() < 1e-6
+    assert bce_d_loss(big, -big, label_noise=0.1).item() > 0.5

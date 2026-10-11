@@ -47,13 +47,13 @@ def download_tinyhero(root="data") -> Path:
     return img_dir
 
 
-def load_rgb(path, size: int = 64) -> np.ndarray:
+def load_rgb(path, size: int = 64, background=BACKGROUND) -> np.ndarray:
     """PNG RGBA -> composición sobre fondo fijo -> RGB uint8 (H, W, 3)."""
     im = Image.open(path).convert("RGBA")
     if im.size != (size, size):
         # NEAREST y no bilineal: el bilineal mezcla píxeles vecinos y emborrona el pixel art.
         im = im.resize((size, size), Image.NEAREST)
-    bg = Image.new("RGBA", im.size, BACKGROUND + (255,))
+    bg = Image.new("RGBA", im.size, tuple(background) + (255,))
     return np.asarray(Image.alpha_composite(bg, im).convert("RGB"))
 
 
@@ -61,14 +61,15 @@ class TinyHero(Dataset):
     """Todo el dataset cabe en memoria (3648 x 64 x 64 x 3 uint8 ≈ 45 MB), así que se carga una sola vez
     y cada __getitem__ solo normaliza y, opcionalmente, voltea. Devuelve (imagen en [-1, 1], vista)."""
 
-    def __init__(self, root="data", image_size: int = 64, hflip: bool = True, download: bool = True):
+    def __init__(self, root="data", image_size: int = 64, hflip: bool = True, download: bool = True,
+                 background=BACKGROUND):
         img_dir = download_tinyhero(root) if download else Path(root) / "tinyhero" / "data"
         files = sorted(img_dir.glob("*/*.png"), key=lambda p: (int(p.parent.name), int(p.stem)))
         if not files:
             raise FileNotFoundError(f"No hay PNG en {img_dir}")
         self.files = files
         self.views = torch.tensor([int(p.parent.name) for p in files])
-        arr = np.stack([load_rgb(p, image_size) for p in files])        # (N, H, W, 3) uint8
+        arr = np.stack([load_rgb(p, image_size, background) for p in files])        # (N, H, W, 3) uint8
         self.images = torch.from_numpy(arr).permute(0, 3, 1, 2).contiguous()  # (N, 3, H, W)
         # Flip horizontal p=0.5. Válido en el modelo INCONDICIONAL: un sprite mirando a la izquierda
         # volteado es un sprite plausible mirando a la derecha. Si se condicionara por vista,

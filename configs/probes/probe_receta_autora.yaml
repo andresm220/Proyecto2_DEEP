@@ -1,0 +1,8 @@
+# Prueba corta: receta de la autora de TinyHero sobre el control (fondo negro, etiquetas ruidosas,
+# dropout 0.2 en D, batch 64). Diagnóstico del colapso de base; ver diapositiva 8.
+inherit: ../base.yaml
+name: probe_receta_autora
+background: black
+label_noise: 0.1
+d_dropout: 0.2
+batch_size: 64
