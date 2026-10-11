@@ -82,6 +82,27 @@ display(Image(f'{OUT}/figs/cmp_base_vs_hinge_curves.png'))"""),
 - *Métricas (de Persona B, `metrics.json`):* diversidad (distancia coseno media entre pares, más alta = más
   diversa) y novedad (distancia al vecino más cercano del train).
 - *Veredicto vs. el criterio de la hipótesis:* ¿se cumplió "menos filas repetidas y más diversidad sin bajar la calidad"?"""),
+    md("""## 4b. Experimento de estabilización: normalización espectral en D (Persona B)
+
+**Hipótesis (escrita antes de entrenar):** Creemos que la normalización espectral en D mejorará la estabilidad
+porque limita la constante de Lipschitz de D, evitando que se vuelva demasiado fuerte y deje a G sin gradiente útil.
+Lo consideraremos útil si la pérdida de D no colapsa a ~0, las curvas oscilan menos y la diversidad no baja.
+
+**Cambio único respecto a base:** `spectral_norm_d: true` (ver `configs/exp_sn.yaml`): cada Conv de D se envuelve
+con `torch.nn.utils.spectral_norm`. Todo lo demás (pérdida BCE no saturante, BatchNorm, datos, semilla, épocas,
+ruido fijo) queda igual a base."""),
+    code("""import datetime
+print('Hipótesis registrada:', datetime.datetime.now().isoformat(timespec='minutes'))
+!python -c "from src.utils import load_config, diff_configs; print(diff_configs(load_config('configs/exp_sn.yaml'), load_config('configs/base.yaml')))\""""),
+    code("""entrenar('configs/exp_sn.yaml', 'exp_sn')"""),
+    code("""for f in ['fixed_grid.png', 'progress.png', 'losses.png']:
+    display(Image(f'{OUT}/runs/exp_sn/{f}'))
+!python -m src.compare --out-root "$OUT" --runs base exp_sn --out "$OUT/figs/cmp_base_vs_sn"
+!python -m src.compare --out-root "$OUT" --runs base exp_hinge exp_sn --out "$OUT/figs/cmp_todos"
+display(Image(f'{OUT}/figs/cmp_base_vs_sn_grids.png'))
+display(Image(f'{OUT}/figs/cmp_base_vs_sn_curves.png'))"""),
+    md("""**Análisis SN (completar):** ¿la pérdida de D se mantuvo lejos de 0? ¿las curvas oscilan menos que en base?
+¿la diversidad (notebook 03, `comparacion.csv`) bajó, se mantuvo o subió? Veredicto contra el criterio de la hipótesis."""),
     md("""## 5. Modelo final (después de S2)
 
 Decidir con B la configuración final a partir de `comparacion.csv`, escribir aquí la decisión y su porqué,
