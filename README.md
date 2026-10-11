@@ -141,7 +141,7 @@ Debe imprimir `OK: la galería se regenera exacta` (0 píxeles distintos en los 
     diferencias (~1e-15) ya no cambian ningún píxel.
 
 **Pesos completos** (G + D + optimizadores, para reanudar o reevaluar): `MyDrive/proyecto2-gan/outputs/runs/<run>/checkpoints/`
-*(enlace de Google Drive por agregar)*.
+[carpeta en Google Drive](https://drive.google.com/drive/folders/1589Ea5lfHBpj2ej36_ieHIj9f1Ze5WWa?usp=sharing).
 
 ## Resultados
 
