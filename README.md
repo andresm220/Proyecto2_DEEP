@@ -35,7 +35,7 @@ En Google Colab, torch y torchvision ya vienen instalados. El flujo completo en 
 ```
 configs/      base.yaml (control), exp_hinge.yaml, exp_sn.yaml, final.yaml
 src/
-  data.py       dataset TinyHero: descarga, RGBA→RGB sobre blanco, [-1, 1], flip horizontal
+  data.py       dataset TinyHero: descarga, RGBA→RGB sobre negro, [-1, 1], flip horizontal
   models.py     DCGAN (Generator, Discriminator con flag spectral_norm_d)
   losses.py     bce_nonsat y hinge
   train.py      loop de entrenamiento genérico por config, checkpoints, --resume
@@ -46,7 +46,7 @@ src/
 notebooks/    01_datos, 02_entrenamiento_y_experimentos, 03_galeria_y_vecinos
 tests/        pytest (CPU, unos 3 min)
 outputs/      figs/, data_stats.json, fixed_noise.pt, runs/<name>/
-galeria/      10 PNG + seeds.json + z_vectors.pt
+galeria/      10 PNG + galeria.png + seeds.json + z_vectors.pt + G_final.pt (pesos de G)
 ```
 
 ## Datos
