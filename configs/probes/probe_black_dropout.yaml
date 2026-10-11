@@ -1,0 +1,5 @@
+# Prueba corta: fondo negro + dropout 0.2 en D (batch 128 como el control).
+inherit: ../base.yaml
+name: probe_black_dropout
+background: black
+d_dropout: 0.2

@@ -1,0 +1,4 @@
+# Prueba corta: solo fondo negro sobre el control (aislar qué parte de la receta de la autora importa).
+inherit: ../base.yaml
+name: probe_black
+background: black
