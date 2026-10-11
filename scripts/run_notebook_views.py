@@ -24,8 +24,14 @@ def main(src, dst):
                 continue
             if "drive.mount" in cell.source:
                 lines = [l for l in cell.source.splitlines() if "google.colab" not in l and "drive.mount" not in l]
+                original = cell.source
                 setup = nbformat.v4.new_code_cell("\n".join(lines))
                 client.execute_cell(setup, i)
+                # execute_cell deja la celda ejecutada en nb.cells[i]: devolverle su código original
+                nb.cells[i] = setup
+                setup.source = original
+                if "id" in cell:
+                    setup.id = cell.id
                 print(f"[{i}] setup sin drive.mount")
                 continue
             if any(k in cell.source for k in SKIP):
