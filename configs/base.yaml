@@ -8,7 +8,7 @@ nz: 100
 ngf: 64
 ndf: 64
 batch_size: 128
-epochs: 100            # ajustar tras medir tiempo/época; MISMO valor en todos los experimentos
+epochs: 250            # T4: 5.8 s/época medido -> ~24 min por run. MISMO valor en todos los experimentos
 lr_g: 0.0002
 lr_d: 0.0002
 betas: [0.5, 0.999]
@@ -17,5 +17,5 @@ spectral_norm_d: false
 augment_hflip: true
 fixed_noise_seed: 1234 # 16 vectores z fijos para la rejilla
 n_fixed: 16
-snapshot_every: 5      # épocas entre snapshots de la rejilla fija
-ckpt_every: 5
+snapshot_every: 10     # épocas entre snapshots de la rejilla fija (25 snapshots)
+ckpt_every: 25         # ~75 MB por checkpoint -> 10 por run (~750 MB en Drive)
