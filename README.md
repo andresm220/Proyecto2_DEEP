@@ -111,23 +111,55 @@ Tests: `python -m pytest tests/ -p no:asyncio`
 
 ## Galería
 
+Los 10 personajes están en `galeria/` (64×64 y versión 256×256 ampliada con NEAREST) junto con `galeria.png`,
+`seeds.json` (seed, cluster, nombre, clase, criterio y tasa de selección), `z_vectors.pt` y **los pesos del
+generador final, `galeria/G_final.pt`** (solo G, 14 MB). Para regenerarla exacta:
+
 ```bash
-python -m src.gallery --regenerate --weights <ruta a los pesos finales> --seeds galeria/seeds.json
+python -m src.gallery --regenerate --weights galeria/G_final.pt --seeds galeria/seeds.json
 ```
 
-- Se generan **N = 200** muestras. La muestra *i* usa `torch.Generator().manual_seed(i)` → `z_i`, así que cada
-  personaje queda identificado por un entero.
-- **Tasa de selección:** 10 de 200. El criterio de selección (k-means sobre features más revisión visual) está en
-  `galeria/seeds.json` y en la presentación.
-- **La galería se genera en CPU y de a una muestra (batch 1)**, tanto al seleccionar como al regenerar. En GPU,
-  cuDNN puede elegir algoritmos distintos según el tamaño del batch, y una diferencia de 1e-6 basta para cambiar
-  algún píxel al redondear a 0–255. En CPU y con batch 1, la regeneración es exacta píxel a píxel.
-- **Siempre `G.eval()`.** En modo `eval`, BatchNorm usa las estadísticas acumuladas durante el entrenamiento, así que
-  una misma `z` produce siempre la misma imagen, sin importar con qué otras `z` vaya en el batch. En modo `train`,
-  BatchNorm normaliza con las estadísticas del batch actual y la imagen cambia. Por eso hay que usar el mismo modo
-  al seleccionar y al regenerar; si se mezclan, la galería no se reproduce igual.
+Debe imprimir `OK: la galería se regenera exacta` (0 píxeles distintos en los 10 personajes).
 
-**Pesos finales:** *(enlace de Google Drive, se agrega al terminar el entrenamiento final)*
+- **Modelo:** `configs/final.yaml` (hinge, 500 épocas). `G_final.pt` se exportó de `runs/final/checkpoints/last.pt`
+  con `python -m src.gallery --export-g`; `seeds.json` guarda su SHA-256 y `--regenerate` lo verifica.
+- **Candidatos:** **N = 200** (seeds 0–199). La muestra *i* usa `torch.Generator().manual_seed(i)` → `z_i`, así que
+  cada personaje queda identificado por un entero.
+- **Tasa de selección: 10 de 200.** k-means (k = 10) sobre features ResNet-18 de los 200 candidatos; de cada cluster
+  se tomó por revisión visual la muestra más legible según la vara del universo (en todos los clusters coincidió con
+  la más cercana al centroide, porque dentro de cada cluster las muestras son casi idénticas). Hojas de cada cluster:
+  `galeria/candidatos/`.
+- **Por qué se regenera igual en otra máquina:**
+  - **Siempre `G.eval()`.** En modo `eval`, BatchNorm usa las estadísticas acumuladas durante el entrenamiento, así que
+    una misma `z` produce la misma imagen sin importar el resto del batch. En modo `train` normaliza con las
+    estadísticas del batch actual y la imagen cambia; por eso hay que usar el mismo modo al seleccionar y al regenerar.
+  - **Desde los `z` guardados** (`z_vectors.pt`), no volviendo a sortearlos: `torch.randn` con la misma seed puede
+    diferir ~1e-8 entre versiones de PyTorch o CPUs. `--regenerate` comprueba además que esos `z` correspondan a
+    las seeds declaradas (tolerancia 1e-6).
+  - **En CPU y en float64.** En float32, dos CPUs distintas (lo comprobamos entre Colab y una laptop) daban 1 píxel
+    distinto en 2 de los 10 personajes: valores que caían justo en x.5 se redondeaban distinto. En float64 esas
+    diferencias (~1e-15) ya no cambian ningún píxel.
+
+**Pesos completos** (G + D + optimizadores, para reanudar o reevaluar): `MyDrive/proyecto2-gan/outputs/runs/<run>/checkpoints/`
+*(enlace de Google Drive por agregar)*.
+
+## Resultados
+
+| Run | Cambio respecto a base | Diversidad ↑ | Novedad | D(x) / D(G(z)) última época |
+|---|---|---|---|---|
+| base | — | 0.102 | 0.171 | 0.97 / 0.035 |
+| exp_hinge | `loss: hinge` | **0.104** | 0.141 | 0.92 / 0.074 |
+| exp_sn | `spectral_norm_d: true` | 0.090 | 0.136 | 0.98 / 0.022 |
+| final | hinge, 500 épocas | 0.104 | 0.131 | 0.99 / 0.02 |
+| *dataset real* | | *0.189* | | |
+
+Diversidad = distancia coseno media entre pares de 500 muestras (features ResNet-18); novedad = distancia coseno
+media al vecino más cercano del train. Tabla completa: `outputs/comparacion.csv`; figuras en `outputs/figs/` y
+`outputs/runs/`. Hinge mejoró poco la diversidad pero dejó a D menos dominante y dio siluetas más nítidas; SN la
+empeoró (−12 %), así que el modelo final es hinge solo. Aun así, el generador final reparte las muestras en pocos
+modos (dentro de cada cluster de la galería las muestras son casi idénticas): colapso de modo parcial. Los vecinos
+más cercanos de los 10 personajes (`galeria/vecinos.png`, similitud 0.84–0.90) son personajes distintos del
+dataset: comparten color de pelo o paleta, no el personaje completo.
 
 ## Semillas
 
