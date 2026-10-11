@@ -14,6 +14,11 @@ cells = [
 La galería se genera en **CPU**, con `G.eval()` y en **float64**, desde los `z` guardados en `z_vectors.pt`, así
 que se puede regenerar exacta en cualquier máquina (en float32 dos CPUs distintas llegaban a diferir en 1 píxel).
 No hace falta GPU para este notebook (la GPU solo acelera las métricas)."""),
+    md("""> **Sobre las salidas guardadas en este notebook:** las celdas que entrenan o calculan (`entrenar(...)`,
+> `--export-g`, `--candidates`, `--select`, métricas) se corrieron en Colab durante el proyecto y sus resultados
+> quedaron en Drive y en el repo (`outputs/`, `galeria/`). Las salidas que se ven aquí son de las celdas que
+> **muestran** esos resultados, ejecutadas otra vez sobre los mismos archivos para dejarlas visibles; las celdas
+> que entrenan o sobrescriben resultados no se volvieron a correr y por eso aparecen sin salida."""),
     code("""from google.colab import drive
 drive.mount('/content/drive')
 OUT = '/content/drive/MyDrive/proyecto2-gan/outputs'
@@ -21,6 +26,7 @@ GAL = '/content/drive/MyDrive/proyecto2-gan/galeria'
 !rm -rf /content/proyecto2-gan && git clone -q https://github.com/andresm220/Proyecto2_DEEP.git /content/proyecto2-gan
 %cd /content/proyecto2-gan
 !git log --oneline -1
+FINAL = f'{GAL}/G_final.pt'   # pesos de G del modelo final (se exportan en la sección 2)
 from IPython.display import Image, display
 import pandas as pd, json"""),
     md("""## 1. Métricas por run
@@ -31,8 +37,8 @@ import pandas as pd, json"""),
   podría estar copiando. Ojo: el train tiene cada personaje en 4 vistas, así que un vecino muy cercano puede ser
   otra vista del mismo personaje."""),
     code("""for run in ['base', 'exp_hinge', 'exp_sn']:
-    !python -m src.evaluate --run "$OUT/runs/{run}" --out-root "$OUT" > /dev/null && echo "{run}: ok"
-!python -m src.evaluate --out-root "$OUT" --table base exp_hinge exp_sn
+    !python -m src.evaluate --run "$OUT/runs/{run}" --out-root "$OUT" > /dev/null && echo "{run}: ok\""""),
+    code("""!python -m src.evaluate --out-root "$OUT" --table base exp_hinge exp_sn
 pd.read_csv(f'{OUT}/comparacion.csv')"""),
     code("""for run in ['base', 'exp_hinge', 'exp_sn']:
     print(run); display(Image(f'{OUT}/runs/{run}/vecinos_muestra.png', width=700))"""),
@@ -43,7 +49,6 @@ candidatos (el código lo verifica con el hash SHA-256 de los pesos)."""),
     code("""# Exportar solo G (~14 MB) desde el checkpoint completo (~75 MB): este archivo va en el zip de entrega y es el
 # que se usa para generar, seleccionar y regenerar la galería (seeds.json guarda su SHA-256).
 !python -m src.gallery --export-g --weights "{OUT}/runs/final/checkpoints/last.pt" --out "$GAL"
-FINAL = f'{GAL}/G_final.pt'
 !python -m src.gallery --candidates --weights "$FINAL" --n 200 --out "$GAL\""""),
     code("""import glob
 for f in sorted(glob.glob(f'{GAL}/candidatos/cluster_*.png')):
@@ -63,8 +68,8 @@ pares parecidos entre sí: 02/06, 01/08 y 07/09."""),
 # Ejemplo: picks['3'] = 57   # cluster 3: la 57 tiene la silueta completa; la del centroide sale cortada
 json.dump(picks, open(f'{GAL}/picks.json', 'w'), indent=2)
 picks"""),
-    code("""!python -m src.gallery --select --weights "$FINAL" --out "$GAL"
-display(Image(f'{GAL}/galeria.png'))
+    code("""!python -m src.gallery --select --weights "$FINAL" --out "$GAL\""""),
+    code("""display(Image(f'{GAL}/galeria.png'))
 json.load(open(f'{GAL}/seeds.json'))['tasa_seleccion']"""),
     md("## 3. Regeneración exacta (regla del proyecto: el código debe regenerar la galería exacta)"),
     code("""!python -m src.gallery --regenerate --weights "$FINAL" --seeds "$GAL/seeds.json\""""),
@@ -72,8 +77,8 @@ json.load(open(f'{GAL}/seeds.json'))['tasa_seleccion']"""),
 
 Dos criterios: similitud coseno sobre features ResNet-18 (parecido "perceptual") y distancia en píxeles (RMSE,
 detecta copias casi exactas). Cada vecino indica qué personaje del dataset es y en qué vista."""),
-    code("""!python -m src.evaluate --gallery "$GAL/seeds.json" --weights "$FINAL" --out-root "$OUT" > /dev/null
-display(Image(f'{GAL}/vecinos.png'))
+    code("""!python -m src.evaluate --gallery "$GAL/seeds.json" --weights "$FINAL" --out-root "$OUT" > /dev/null"""),
+    code("""display(Image(f'{GAL}/vecinos.png'))
 display(Image(f'{GAL}/vecinos_pixeles.png'))"""),
     md("""**Interpretación:**
 

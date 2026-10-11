@@ -18,6 +18,11 @@ cells = [
 Todo lo que produce el entrenamiento se guarda en Google Drive (`OUT`), porque Colab borra el disco al desconectarse.
 Si Colab se cae a mitad de un run, basta con volver a correr las celdas (o "Ejecutar todo"): `entrenar()` detecta
 el `last.pt` del run y reanuda desde ahí con `--resume`."""),
+    md("""> **Sobre las salidas guardadas en este notebook:** las celdas que entrenan o calculan (`entrenar(...)`,
+> `--export-g`, `--candidates`, `--select`, métricas) se corrieron en Colab durante el proyecto y sus resultados
+> quedaron en Drive y en el repo (`outputs/`, `galeria/`). Las salidas que se ven aquí son de las celdas que
+> **muestran** esos resultados, ejecutadas otra vez sobre los mismos archivos para dejarlas visibles; las celdas
+> que entrenan o sobrescriben resultados no se volvieron a correr y por eso aparecen sin salida."""),
     code("""from google.colab import drive
 drive.mount('/content/drive')
 OUT = '/content/drive/MyDrive/proyecto2-gan/outputs'   # carpeta compartida con Persona B
