@@ -1,0 +1,12 @@
+# Dataset (se descarga con src/data.py)
+data/
+
+# Checkpoints pesados: van a Google Drive, no al repo
+outputs/runs/*/checkpoints/
+
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Espacio de trabajo local de los planes
+.superpowers/
