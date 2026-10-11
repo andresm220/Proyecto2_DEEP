@@ -94,3 +94,17 @@ def test_gallery_neighbors(built_gallery, tmp_path):
     first = next(iter(rep.values()))
     assert len(first["coseno"]) == 3 and first["coseno"][0]["vecino"].startswith("personaje ")
     assert (out / "vecinos.png").exists() and (out / "vecinos_pixeles.png").exists()
+
+
+def test_export_g_is_small_and_generates_identical_images(tiny_run, tmp_path):
+    import torch
+    from src.evaluate import generate, load_generator
+    full = tiny_run / "checkpoints" / "last.pt"
+    gallery("--export-g", "--weights", str(full), "--out", str(tmp_path))
+    small = tmp_path / "G_final.pt"
+    assert small.exists() and small.stat().st_size < full.stat().st_size / 3
+    ck = torch.load(small, weights_only=False)
+    assert set(ck) >= {"G", "config", "epoch"} and "D" not in ck and "optG" not in ck
+    a, _ = generate(load_generator(full)[0], [0, 5, 9])
+    b, _ = generate(load_generator(small)[0], [0, 5, 9])
+    assert torch.equal(a, b)

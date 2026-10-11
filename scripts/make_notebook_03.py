@@ -37,9 +37,12 @@ pd.read_csv(f'{OUT}/comparacion.csv')"""),
     print(run); display(Image(f'{OUT}/runs/{run}/vecinos_muestra.png', width=700))"""),
     md("""## 2. Galería: 200 candidatos del modelo final
 
-`FINAL` apunta a los pesos del modelo final. Si se cambia, hay que volver a generar los candidatos (el código
-lo verifica con el hash SHA-256 de los pesos)."""),
-    code("""FINAL = f'{OUT}/runs/final/checkpoints/last.pt'
+`FINAL` es `galeria/G_final.pt`: solo los pesos de G del modelo final. Si se cambia, hay que volver a generar los
+candidatos (el código lo verifica con el hash SHA-256 de los pesos)."""),
+    code("""# Exportar solo G (~14 MB) desde el checkpoint completo (~75 MB): este archivo va en el zip de entrega y es el
+# que se usa para generar, seleccionar y regenerar la galería (seeds.json guarda su SHA-256).
+!python -m src.gallery --export-g --weights "{OUT}/runs/final/checkpoints/last.pt" --out "$GAL"
+FINAL = f'{GAL}/G_final.pt'
 !python -m src.gallery --candidates --weights "$FINAL" --n 200 --out "$GAL\""""),
     code("""import glob
 for f in sorted(glob.glob(f'{GAL}/candidatos/cluster_*.png')):
@@ -83,7 +86,8 @@ json.dump(meta, open(f'{GAL}/seeds.json', 'w'), indent=2, ensure_ascii=False)
 !python -m src.gallery --select --weights "$FINAL" --out "$GAL" && python -m src.gallery --regenerate --weights "$FINAL" --seeds "$GAL/seeds.json"
 display(Image(f'{GAL}/galeria.png'))"""),
     md("""Al final, copiar la carpeta `galeria/` de Drive a la carpeta `galeria/` del repo (10 PNG + versiones 256,
-`seeds.json`, `z_vectors.pt`) para la entrega."""),
+`seeds.json`, `z_vectors.pt` y `G_final.pt`) para la entrega. Con eso, `python -m src.gallery --regenerate
+--weights galeria/G_final.pt --seeds galeria/seeds.json` funciona sin Drive."""),
 ]
 
 nb = nbf.v4.new_notebook(cells=cells)

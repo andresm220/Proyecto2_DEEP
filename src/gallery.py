@@ -1,5 +1,6 @@
 """Galería: 200 candidatos -> k-means (k=10) -> revisión visual -> 10 personajes, y regeneración exacta.
 
+    0) python -m src.gallery --export-g --weights last.pt      -> galeria/G_final.pt (solo G, ~14 MB: va en el zip)
     1) python -m src.gallery --candidates --weights W      -> galeria/candidatos.json, galeria/candidatos/cluster_XX.png,
                                                              galeria/picks.json (por defecto: el más cercano al centroide)
     2) Revisión visual: mirar las hojas cluster_XX.png y, si hace falta, cambiar en picks.json la seed elegida de
@@ -57,6 +58,18 @@ def contact_sheet(imgs, seeds, path, title, cols=6):
     fig.tight_layout()
     fig.savefig(path)
     plt.close(fig)
+
+
+# ------------------------------------------------------------------ 0) exportar solo G
+def export_generator(ckpt_path, out_path) -> Path:
+    """Guarda solo los pesos de G + su config. Un checkpoint completo (~75 MB) trae también D y los dos Adam,
+    que no hacen falta para generar; así los pesos de la galería caben en la entrega de Canvas."""
+    ck = torch.load(ckpt_path, map_location="cpu", weights_only=False)
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    torch.save({"G": ck["G"], "config": ck["config"], "epoch": ck["epoch"],
+                "source": f"{Path(ckpt_path).name} (sha256 {sha256(ckpt_path)[:12]})"}, out_path)
+    return out_path
 
 
 # ------------------------------------------------------------------ 1) candidatos
@@ -162,6 +175,7 @@ def regenerate(weights_path, seeds_json) -> dict:
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--export-g", action="store_true", help="exportar solo G a <out>/G_final.pt")
     ap.add_argument("--candidates", action="store_true")
     ap.add_argument("--select", action="store_true")
     ap.add_argument("--regenerate", action="store_true")
@@ -173,6 +187,9 @@ def main():
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 
+    if args.export_g:
+        path = export_generator(args.weights, out / "G_final.pt")
+        print(f"Exportado {path} ({path.stat().st_size / 1e6:.1f} MB). Usar este archivo como --weights de aquí en adelante.")
     if args.candidates:
         meta = make_candidates(args.weights, args.n, out)
         print(f"{args.n} candidatos en {K} clusters -> {out / 'candidatos'}; editar {out / 'picks.json'} y correr --select")
