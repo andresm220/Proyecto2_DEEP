@@ -30,3 +30,12 @@ def test_eval_generation_independent_of_batch():
         batch = G(z)
         single = torch.cat([G(z[i:i + 1]) for i in range(16)])
     assert torch.allclose(batch, single, atol=1e-5)
+
+
+def test_d_dropout_flag():
+    cfg = load_config("configs/base.yaml")
+    _, D = build_models({**cfg, "d_dropout": 0.2})
+    drops = [m for m in D.modules() if isinstance(m, torch.nn.Dropout)]
+    assert len(drops) == 4 and all(m.p == 0.2 for m in drops)
+    _, D0 = build_models({**cfg, "d_dropout": 0.0})
+    assert not any(isinstance(m, torch.nn.Dropout) for m in D0.modules())

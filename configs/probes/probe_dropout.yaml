@@ -1,0 +1,4 @@
+# Prueba corta (diagnóstico del colapso de base): dropout 0.2 en D.
+inherit: ../base.yaml
+name: probe_dropout
+d_dropout: 0.2

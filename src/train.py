@@ -31,6 +31,24 @@ from .utils import (diff_configs, get_device, get_fixed_noise, get_rng_state, lo
 CSV_FIELDS = ["epoch", "iter", "loss_D", "loss_G", "D_x", "D_G_z"]
 
 
+def instance_noise_std(epoch: int, epochs: int, start: float) -> float:
+    """Desviación del instance noise en una época (1-indexada): baja linealmente de `start` a 0.
+    Se apaga al final para que G termine aprendiendo a producir imágenes nítidas, no ruidosas."""
+    if start <= 0:
+        return 0.0
+    return max(0.0, start * (1 - (epoch - 1) / epochs))
+
+
+def add_instance_noise(x: torch.Tensor, std: float) -> torch.Tensor:
+    """Instance noise (Sønderby et al. 2016; Arjovsky y Bottou 2017): ruido gaussiano a las entradas de D,
+    reales y falsas por igual. El pixel art vive en una paleta discreta y G produce valores continuos: sin ruido,
+    las dos distribuciones casi no se solapan y D gana trivialmente. Con ruido se solapan y el gradiente de G
+    vuelve a ser informativo."""
+    if std <= 0:
+        return x
+    return x + std * torch.randn_like(x)
+
+
 def save_checkpoint(path: Path, **state) -> None:
     # Escribir a un temporal y renombrar: si Colab se cae a mitad de escritura,
     # last.pt anterior queda intacto en vez de corrupto.
@@ -158,6 +176,7 @@ def main():
     for epoch in range(start_epoch + 1, cfg["epochs"] + 1):
         t0 = time.time()
         rows = []
+        sigma = instance_noise_std(epoch, cfg["epochs"], cfg.get("instance_noise", 0.0))
         for i, (real, _) in enumerate(loader):
             if args.max_iters is not None and i >= args.max_iters:
                 break
@@ -167,15 +186,15 @@ def main():
 
             # ---- paso de D: separar reales de falsas. detach() para no propagar gradiente a G aquí.
             optD.zero_grad(set_to_none=True)
-            real_logits = D(real)
-            fake_logits = D(fake.detach())
+            real_logits = D(add_instance_noise(real, sigma))
+            fake_logits = D(add_instance_noise(fake.detach(), sigma))
             loss_D = d_loss_fn(real_logits, fake_logits)
             loss_D.backward()
             optD.step()
 
             # ---- paso de G: engañar al D recién actualizado (por eso se vuelve a evaluar D(fake)).
             optG.zero_grad(set_to_none=True)
-            loss_G = g_loss_fn(D(fake))
+            loss_G = g_loss_fn(D(add_instance_noise(fake, sigma)))
             loss_G.backward()
             optG.step()
 

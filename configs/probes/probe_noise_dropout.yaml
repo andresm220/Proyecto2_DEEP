@@ -1,0 +1,5 @@
+# Prueba corta (diagnóstico del colapso de base): instance noise 0.2 -> 0 + dropout 0.2 en D.
+inherit: ../base.yaml
+name: probe_noise_dropout
+instance_noise: 0.2
+d_dropout: 0.2

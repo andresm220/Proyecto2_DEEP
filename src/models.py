@@ -41,7 +41,7 @@ class Generator(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, ndf: int = 64, nc: int = 3, spectral_norm_d: bool = False):
+    def __init__(self, ndf: int = 64, nc: int = 3, spectral_norm_d: bool = False, d_dropout: float = 0.0):
         super().__init__()
 
         def down(cin, cout, bn=True):
@@ -49,6 +49,10 @@ class Discriminator(nn.Module):
             if bn:
                 layers.append(nn.BatchNorm2d(cout))
             layers.append(nn.LeakyReLU(0.2, inplace=True))
+            if d_dropout > 0:
+                # Dropout en D: le impide apoyarse siempre en las mismas features "fáciles" para separar
+                # reales de falsas, lo que frena que D domine (lo usa la autora de TinyHero).
+                layers.append(nn.Dropout(d_dropout))
             return layers
 
         self.net = nn.Sequential(
@@ -75,5 +79,6 @@ class Discriminator(nn.Module):
 def build_models(cfg: dict):
     G = Generator(cfg["nz"], cfg["ngf"])
     G.apply(weights_init)
-    D = Discriminator(cfg["ndf"], spectral_norm_d=cfg.get("spectral_norm_d", False))
+    D = Discriminator(cfg["ndf"], spectral_norm_d=cfg.get("spectral_norm_d", False),
+                      d_dropout=cfg.get("d_dropout", 0.0))
     return G, D
