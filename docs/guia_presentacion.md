@@ -134,3 +134,14 @@ Pixel art siempre ampliado con NEAREST (las figuras ya vienen así).
 | Pruebas de fondo blanco | 8 | el fondo blanco provoca el colapso | hallazgo empírico, sin explicación causal |
 | Vecinos más cercanos | 10 | ninguna copia (sim ≤ 0.90); recombina partes | el train tiene 4 vistas por personaje; ResNet-18 prioriza el color |
 | Regeneración exacta | 9 | la galería se reproduce píxel a píxel | en CPU con batch 1 |
+
+---
+
+## Entrega en Canvas: el zip
+
+1. Descargar el repo: en https://github.com/andresm220/Proyecto2_DEEP → botón verde **Code** → **Download ZIP**
+   (trae el código, `galeria/` con `G_final.pt`, `outputs/`, notebooks y README).
+2. Descomprimirlo, meter **`presentacion.pdf`** en la carpeta raíz (junto al `README.md`) y volver a comprimir.
+3. Revisar antes de subir que el zip tenga: `README.md`, `presentacion.pdf`, `src/`, `configs/`, `notebooks/`,
+   `galeria/` (10 PNG + `galeria.png` + `seeds.json` + `z_vectors.pt` + `G_final.pt`) y `outputs/`.
+4. Subirlo a Canvas. Los checkpoints completos no van en el zip: están en el enlace de Drive del README.
