@@ -53,7 +53,12 @@ for f in sorted(glob.glob(f'{GAL}/candidatos/cluster_*.png')):
 Cada hoja muestra un cluster ordenado por cercanía al centroide. `picks.json` trae por defecto la primera
 muestra de cada cluster. Para cada cluster, elegir la muestra **más legible según la vara del universo**:
 (a) figura humanoide completa, (b) atuendo coherente con una clase del reino, (c) distinta de las otras 9.
-Si hace falta, cambiar la seed en la celda siguiente (debe pertenecer a ese cluster) y anotar el porqué."""),
+Si hace falta, cambiar la seed en la celda siguiente (debe pertenecer a ese cluster) y anotar el porqué.
+
+**Resultado de la revisión:** dentro de cada cluster las muestras son casi idénticas (colapso de modo parcial), así
+que en los 10 clusters la muestra más cercana al centroide ya era la más legible y no se cambió ninguna. Tamaños de
+los clusters 0–9: 32, 26, 20, 30, 17, 15, 18, 9, 14 y 19. **Tasa de selección: 10 de 200.** Aun así quedaron tres
+pares parecidos entre sí: 02/06, 01/08 y 07/09."""),
     code("""picks = json.load(open(f'{GAL}/picks.json'))
 # Ejemplo: picks['3'] = 57   # cluster 3: la 57 tiene la silueta completa; la del centroide sale cortada
 json.dump(picks, open(f'{GAL}/picks.json', 'w'), indent=2)
@@ -70,17 +75,37 @@ detecta copias casi exactas). Cada vecino indica qué personaje del dataset es y
     code("""!python -m src.evaluate --gallery "$GAL/seeds.json" --weights "$FINAL" --out-root "$OUT" > /dev/null
 display(Image(f'{GAL}/vecinos.png'))
 display(Image(f'{GAL}/vecinos_pixeles.png'))"""),
-    md("""**Interpretación (completar con honestidad):**
+    md("""**Interpretación:**
 
-- ¿Algún personaje es casi idéntico a su vecino (similitud ≈ 1 o RMSE ≈ 0)? Si sí, **reemplazarlo** por otra
-  muestra de su cluster (`picks.json` → `--select` → `--regenerate`) y **declararlo** en el PDF.
-- ¿El vecino más cercano es el mismo personaje en otra vista? Eso indica que la GAN reprodujo un personaje
-  existente, no que inventó uno.
-- ¿Qué personaje costó más defender como nuevo, y qué dice eso de lo que aprendió la GAN (reflexión final)?"""),
+- **Ninguno es copia.** La similitud coseno con el vecino más cercano va de 0.84 a 0.90 y en píxeles ningún vecino es
+  casi idéntico, así que no hubo que reemplazar ningún personaje.
+- Los vecinos comparten el **color de pelo o la paleta** con el personaje generado, pero no el cuerpo ni la ropa: la
+  GAN parece **recombinar piezas** (pelo de uno, atuendo de otro), igual que el generador LPC con el que se hizo el
+  dataset. A veces aparecen dos vistas del mismo personaje real entre los top-3 (el train tiene 4 vistas por
+  personaje), y varios vecinos son orcos verdes: ResNet-18 se fija mucho en el color dominante.
+- **El más difícil de defender como nuevo:** personaje_00 (Tohil). Su vecino más cercano (personaje 251 del dataset,
+  similitud 0.90) aparece en dos vistas, y su silueta es la del sprite LPC estándar.
+- **Reflexión:** la GAN no aprendió a inventar personajes desde cero sino a recombinar las piezas del generador LPC
+  (cuerpos, peinados, paletas) en combinaciones que no están en el dataset, y además con pocos modos."""),
     md("""## 5. Nombres y clases (bonificación)
 
 Escribir nombre y clase en `seeds.json` y volver a correr `--select`: conserva los nombres (busca por seed) y
-actualiza `galeria.png`. Después, `--regenerate` sigue pasando porque las imágenes no cambian."""),
+actualiza `galeria.png`. Después, `--regenerate` sigue pasando porque las imágenes no cambian.
+
+| # | Nombre | Clase | seed |
+|---|---|---|---|
+| 00 | Tohil, Guardabosques del Cerro | explorador | 64 |
+| 01 | Ixkik, la Espada Carmesí | guerrera | 114 |
+| 02 | Balam el Buhonero | mercader errante | 132 |
+| 03 | Kukul, Arquero del Paso | explorador | 190 |
+| 04 | Itzam, Sabio de Ceniza | mago | 97 |
+| 05 | Gorrak el Desterrado | guerrero orco | 188 |
+| 06 | Chak, Aprendiz de Herrero | gente del reino | 83 |
+| 07 | Ixchel, Hechicera Índigo | maga | 53 |
+| 08 | Hunab, Mercenario Rojo | guerrero | 112 |
+| 09 | Xquic, Vidente de la Niebla | maga | 138 |
+
+Ya están guardados en `galeria/seeds.json`; la celda siguiente solo hace falta para cambiarlos."""),
     code("""meta = json.load(open(f'{GAL}/seeds.json'))
 # meta['characters'][0].update(nombre='Ixbalam, Guardiana del Paso', clase='guerrera')
 json.dump(meta, open(f'{GAL}/seeds.json', 'w'), indent=2, ensure_ascii=False)
