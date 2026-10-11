@@ -1,0 +1,22 @@
+{
+  "n_images": 3648,
+  "n_per_view": {
+    "espalda": 912,
+    "izquierda": 912,
+    "frente": 912,
+    "derecha": 912
+  },
+  "resolution": [
+    64,
+    64
+  ],
+  "channels": "RGB (PNG RGBA compuesto sobre fondo blanco)",
+  "normalization": "[-1, 1]  (x / 127.5 - 1), coincide con la salida tanh de G",
+  "augmentations": [
+    "RandomHorizontalFlip(p=0.5) (solo en entrenamiento)"
+  ],
+  "resize": "ninguno necesario (todas son 64x64); si hiciera falta: NEAREST",
+  "source": "https://github.com/AgaMiko/pixel_character_generator/raw/master/data.zip",
+  "license": "CC-BY-SA 3.0 y GNU GPL 3.0 (Liberated Pixel Cup)",
+  "n_unique_characters": 912
+}
