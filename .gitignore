@@ -16,3 +16,6 @@ proyecto2_gan_plan.md
 
 # Planes de trabajo locales (no se publican)
 docs/superpowers/
+
+# Caché de features ResNet-18 (se recalcula)
+outputs/train_feats_*.pt

@@ -108,3 +108,29 @@ def test_export_g_is_small_and_generates_identical_images(tiny_run, tmp_path):
     a, _ = generate(load_generator(full)[0], [0, 5, 9])
     b, _ = generate(load_generator(small)[0], [0, 5, 9])
     assert torch.equal(a, b)
+
+
+def test_regenerate_uses_saved_z_and_tolerates_rng_drift(built_gallery, tmp_path):
+    # torch.randn con la misma seed puede diferir ~1e-8 entre versiones/CPU: z_vectors.pt es la fuente de verdad.
+    import shutil
+    import torch
+    copy = tmp_path / "g"
+    shutil.copytree(out := built_gallery[0], copy)
+    z = torch.load(copy / "z_vectors.pt")
+    torch.save(z + 1e-8, copy / "z_vectors.pt")
+    r = regenerate(built_gallery[1], copy / "seeds.json")
+    assert r["z_ok"]
+    # y un z claramente distinto se detecta
+    torch.save(z + 0.5, copy / "z_vectors.pt")
+    assert not regenerate(built_gallery[1], copy / "seeds.json")["z_ok"]
+
+
+def test_gallery_render_is_float64():
+    import torch
+    from src.gallery import render
+    from src.models import Generator
+    G = Generator().eval()
+    z = torch.randn(2, 100, 1, 1)
+    out = render(G, z)
+    assert out.dtype == torch.float64 and out.shape == (2, 3, 64, 64)
+    assert next(G.parameters()).dtype == torch.float32  # no modifica el modelo original

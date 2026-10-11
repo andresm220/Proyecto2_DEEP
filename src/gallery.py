@@ -9,7 +9,8 @@
                                                              seeds.json, z_vectors.pt
     4) python -m src.gallery --regenerate --weights W --seeds galeria/seeds.json   (verificación píxel a píxel)
 
-Todo se genera en CPU, con G.eval() y una muestra a la vez: así la regeneración es exacta (ver README).
+Los PNG se generan en CPU, con G.eval() y en float64, desde los z guardados: así la regeneración es exacta
+también en otra máquina (ver README).
 """
 import argparse
 import hashlib
@@ -20,7 +21,7 @@ import numpy as np
 import torch
 from PIL import Image
 
-from .evaluate import FeatureExtractor, generate, load_generator
+from .evaluate import FeatureExtractor, generate, load_generator, render, z_from_seed
 from .utils import to_uint8
 
 K = 10
@@ -119,7 +120,8 @@ def select(weights, out: Path) -> dict:
     G, cfg = load_generator(weights, "cpu")
     order = sorted(picks, key=int)
     seeds = [int(picks[c]) for c in order]
-    imgs, z = generate(G, seeds, cfg["nz"])
+    z = torch.cat([z_from_seed(s, cfg["nz"]) for s in seeds])
+    imgs = render(G, z)
     chars = []
     for i, (c, s, img) in enumerate(zip(order, seeds, imgs)):
         f64, f256 = f"personaje_{i:02d}.png", f"personaje_{i:02d}_256.png"
@@ -130,7 +132,8 @@ def select(weights, out: Path) -> dict:
                       "nombre": prev.get("nombre", ""), "clase": prev.get("clase", "")})
     torch.save(z, out / "z_vectors.pt")
     meta = {"weights_file": cand["weights_file"], "weights_sha256": cand["weights_sha256"],
-            "generacion": "G.eval(), CPU, batch 1, z_i = torch.randn(1, nz, 1, 1, generator=torch.Generator().manual_seed(seed))",
+            "generacion": ("G.eval(), CPU, float64; z_i = torch.randn(1, nz, 1, 1, generator=torch.Generator()"
+                           ".manual_seed(seed)), guardados en z_vectors.pt (fuente de verdad al regenerar)"),
             "n_candidates": cand["n_candidates"], "seeds_candidatos": cand["seeds"],
             "tasa_seleccion": f"{K} de {cand['n_candidates']}", "criterio": CRITERIO, "characters": chars}
     (out / "seeds.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -162,12 +165,16 @@ def regenerate(weights_path, seeds_json) -> dict:
     meta = json.loads(seeds_json.read_text(encoding="utf-8"))
     G, cfg = load_generator(weights_path, "cpu")
     chars = meta["characters"]
-    imgs, z = generate(G, [c["seed"] for c in chars], cfg["nz"])
+    # Se regenera desde los z GUARDADOS: torch.randn con la misma seed puede diferir ~1e-8 entre versiones de
+    # PyTorch o CPUs. z_ok solo comprueba que esos z correspondan a las seeds declaradas (tolerancia 1e-6).
+    z = torch.load(out / "z_vectors.pt")
+    z_seed = torch.cat([z_from_seed(c["seed"], cfg["nz"]) for c in chars])
+    z_ok = z.shape == z_seed.shape and (z - z_seed).abs().max().item() < 1e-6
+    imgs = render(G, z)
     mismatches = {}
     for c, img in zip(chars, imgs):
         saved = np.array(Image.open(out / c["file"]).convert("RGB"))
         mismatches[c["file"]] = int((saved != to_png_array(img)).any(axis=2).sum())
-    z_ok = (out / "z_vectors.pt").exists() and torch.equal(torch.load(out / "z_vectors.pt"), z)
     weights_ok = sha256(weights_path) == meta["weights_sha256"]
     return {"ok": weights_ok and z_ok and all(v == 0 for v in mismatches.values()),
             "weights_ok": weights_ok, "z_ok": z_ok, "mismatches": mismatches}

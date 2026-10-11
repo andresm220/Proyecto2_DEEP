@@ -11,8 +11,9 @@ cells = [
 3. **Regeneración exacta** de la galería desde los pesos + seeds (verificación píxel a píxel).
 4. **Vecinos más cercanos** de los 10 personajes en el set de entrenamiento, para juzgar si son nuevos.
 
-La galería se genera en **CPU**, con `G.eval()` y una muestra a la vez, así que se puede regenerar exacta en
-cualquier máquina. No hace falta GPU para este notebook (la GPU solo acelera las métricas)."""),
+La galería se genera en **CPU**, con `G.eval()` y en **float64**, desde los `z` guardados en `z_vectors.pt`, así
+que se puede regenerar exacta en cualquier máquina (en float32 dos CPUs distintas llegaban a diferir en 1 píxel).
+No hace falta GPU para este notebook (la GPU solo acelera las métricas)."""),
     code("""from google.colab import drive
 drive.mount('/content/drive')
 OUT = '/content/drive/MyDrive/proyecto2-gan/outputs'

@@ -50,6 +50,16 @@ def generate(G, seeds, nz: int = 100, batch_size: int = 1):
     return torch.cat(out), z
 
 
+@torch.no_grad()
+def render(G, z: torch.Tensor) -> torch.Tensor:
+    """Genera en float64 (copia de G; el original no cambia). Para la galería: en float32, CPUs distintas
+    (p. ej. AVX-512 en Colab vs AVX2 en una laptop) difieren en el último bit, y un píxel cuyo valor cae justo en
+    x.5 se redondea distinto. En float64 esas diferencias (~1e-15) ya no cruzan bordes de redondeo."""
+    import copy
+    Gd = copy.deepcopy(G).double().cpu().eval()
+    return Gd(z.double().cpu())
+
+
 # ------------------------------------------------------------------ features
 class FeatureExtractor:
     def __init__(self, device="cpu"):
@@ -153,7 +163,7 @@ def neighbors_figure(gen, train_imgs, idx, scores, labels, path, title, score_na
         for ax in axes[r]:
             ax.axis("off")
     fig.suptitle(title)
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0, 1, 1 - 0.5 / (2.3 * n)))  # deja ~0.5 pulgadas arriba para el título
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path)
     plt.close(fig)
@@ -224,7 +234,7 @@ def gallery_neighbors(seeds_json: Path, weights: str, data_root: str, device: st
     meta = json.loads(Path(seeds_json).read_text(encoding="utf-8"))
     chars = meta["characters"]
     G, cfg = load_generator(weights, "cpu")
-    imgs, _ = generate(G, [c["seed"] for c in chars], cfg["nz"])  # CPU, batch 1: las mismas que la galería
+    imgs = render(G, torch.load(Path(seeds_json).parent / "z_vectors.pt")).float()  # las mismas de la galería
     ds = train_dataset_for(cfg, data_root)
     ext = FeatureExtractor(device)
     ref = train_features(ds, ext, out_root / f"train_feats_{cfg.get('background', 'white')}.pt")
