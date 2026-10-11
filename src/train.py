@@ -22,7 +22,7 @@ import torch
 import yaml
 from torch.utils.data import DataLoader
 
-from .data import TinyHero
+from .data import BACKGROUNDS, TinyHero
 from .losses import get_loss
 from .models import build_models
 from .utils import (diff_configs, get_device, get_fixed_noise, get_rng_state, load_config,
@@ -125,7 +125,7 @@ def main():
 
     # ------------------------------------------------------------ datos
     # Fondo: "white" (por defecto) o "black". Negro = lo que guardan los PNG bajo alfa 0 (y lo que usó la autora).
-    background = {"white": (255, 255, 255), "black": (0, 0, 0)}[cfg.get("background", "white")]
+    background = BACKGROUNDS[cfg.get("background", "white")]
     ds = TinyHero(args.data_root, image_size=cfg["image_size"], hflip=cfg["augment_hflip"], background=background)
     loader_gen = torch.Generator().manual_seed(cfg["seed"])  # orden de barajado reproducible
     loader = DataLoader(

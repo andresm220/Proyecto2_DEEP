@@ -10,7 +10,7 @@
     64,
     64
   ],
-  "channels": "RGB (PNG RGBA compuesto sobre fondo blanco)",
+  "channels": "RGB (PNG RGBA compuesto sobre fondo negro)",
   "normalization": "[-1, 1]  (x / 127.5 - 1), coincide con la salida tanh de G",
   "augmentations": [
     "RandomHorizontalFlip(p=0.5) (solo en entrenamiento)"

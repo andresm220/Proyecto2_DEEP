@@ -37,7 +37,7 @@ from src.utils import grid_image"""),
 El arte LPC tiene **doble licencia: CC-BY-SA 3.0 y GNU GPL 3.0**. Ambas exigen **atribución** (LPC contributors,
 makrohn, A. Mikołajczyk) y **compartir bajo la misma licencia**, así que los pesos y la galería que publiquemos
 quedan bajo esas mismas licencias."""),
-    code("""ds = TinyHero("data", hflip=False)   # descarga y descomprime si hace falta
+    code("""ds = TinyHero("data", hflip=False, background=(0, 0, 0))   # fondo negro, igual que configs/base.yaml
 print("Fuente:", DATA_URL)
 print("Imágenes:", len(ds), "| tensor:", tuple(ds.images.shape), ds.images.dtype)"""),
     md("""## Tamaño
@@ -59,7 +59,7 @@ plt.axis("off"); plt.title("Filas: espalda, izquierda, frente, derecha"); plt.sh
 
 | Paso | Decisión | Por qué |
 |---|---|---|
-| Canal alfa | Los PNG son RGBA; se **componen sobre fondo blanco** y se pasan a RGB | La GAN genera 3 canales; un fondo fijo evita que tenga que aprender transparencia. Blanco hace legibles los contornos oscuros. |
+| Canal alfa | Los PNG son RGBA; se **componen sobre fondo negro** y se pasan a RGB | La GAN genera 3 canales; un fondo fijo evita que tenga que aprender transparencia. Negro es el RGB que los PNG ya guardan bajo los píxeles transparentes. Primero usamos blanco y G colapsaba a un solo personaje en todas las configuraciones; con negro el colapso desaparece (ver README, "Problemas encontrados"). |
 | Resolución | Se verificó que **todas son 64×64** (no hubo que redimensionar) | Si hiciera falta, se usaría `NEAREST`: el bilineal emborrona el pixel art. |
 | Normalización | **[−1, 1]** con `x / 127.5 − 1` | El generador termina en `tanh`, cuyo rango es [−1, 1]. |
 | Aumento | **Flip horizontal, p = 0.5** (solo en entrenamiento) | Válido en el modelo incondicional: un sprite volteado sigue siendo plausible. Si se condicionara por vista, el flip mezclaría izquierda/derecha y habría que quitarlo. |

@@ -26,9 +26,11 @@ DATA_URL = "https://github.com/AgaMiko/pixel_character_generator/raw/master/data
 # Ojo: el archivo k.png es el MISMO personaje en las 4 carpetas -> 912 personajes únicos x 4 vistas.
 VIEW_NAMES = {0: "espalda", 1: "izquierda", 2: "frente", 3: "derecha"}
 
-# Fondo sobre el que se componen los PNG transparentes. Blanco: así las siluetas con contorno
-# oscuro se leen bien, y la GAN no tiene que aprender un canal alfa (salida RGB de 3 canales).
+# Fondo sobre el que se componen los PNG transparentes (la GAN genera RGB, no aprende un canal alfa).
+# Por defecto blanco, pero el control usa NEGRO (`background: black` en configs/base.yaml): con fondo blanco
+# G colapsaba a un solo personaje en todas las configuraciones probadas (ver README, "Problemas encontrados").
 BACKGROUND = (255, 255, 255)
+BACKGROUNDS = {"white": (255, 255, 255), "black": (0, 0, 0)}
 
 
 def download_tinyhero(root="data") -> Path:
@@ -75,6 +77,7 @@ class TinyHero(Dataset):
         # volteado es un sprite plausible mirando a la derecha. Si se condicionara por vista,
         # el flip mezclaría etiquetas izquierda/derecha y habría que desactivarlo.
         self.hflip = hflip
+        self.background = tuple(background)
 
     def __len__(self):
         return len(self.images)
@@ -92,7 +95,8 @@ class TinyHero(Dataset):
             "n_images": len(self),
             "n_per_view": {VIEW_NAMES[v]: counts[v] for v in range(4)},
             "resolution": list(self.images.shape[-2:]),
-            "channels": "RGB (PNG RGBA compuesto sobre fondo blanco)",
+            "channels": "RGB (PNG RGBA compuesto sobre fondo "
+                        f"{'negro' if self.background == (0, 0, 0) else 'blanco' if self.background == (255, 255, 255) else self.background})",
             "normalization": "[-1, 1]  (x / 127.5 - 1), coincide con la salida tanh de G",
             "augmentations": ["RandomHorizontalFlip(p=0.5)"] if self.hflip else [],
             "resize": "ninguno necesario (todas son 64x64); si hiciera falta: NEAREST",
@@ -105,9 +109,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default="data")
     ap.add_argument("--out", default="outputs")
+    ap.add_argument("--background", default="black", choices=list(BACKGROUNDS), help="el mismo que configs/base.yaml")
     args = ap.parse_args()
 
-    ds = TinyHero(args.root, hflip=False)
+    ds = TinyHero(args.root, hflip=False, background=BACKGROUNDS[args.background])
     out = Path(args.out)
     (out / "figs").mkdir(parents=True, exist_ok=True)
 

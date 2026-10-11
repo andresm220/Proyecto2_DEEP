@@ -56,7 +56,26 @@ python -m src.data            # descarga data.zip, genera outputs/data_stats.jso
 ```
 
 TinyHero tiene 3 648 sprites de 64×64: 912 personajes × 4 vistas (espalda, izquierda, frente, derecha).
+Los PNG (RGBA) se componen sobre **fondo negro**, se normalizan a [−1, 1] y se usa flip horizontal p=0.5.
 Los detalles de la preparación están en `notebooks/01_datos.ipynb`.
+
+## Problemas encontrados
+
+1. **Con fondo blanco, G colapsaba en todas las configuraciones.** La primera base (DCGAN del tutorial, fondo
+   blanco, 100 épocas) aprendió personajes reconocibles entre las épocas 20 y 60, pero **los 16 z de la rejilla
+   fija daban el mismo personaje** (mode collapse), y después de la época 60 divergió a ruido: la pérdida de D
+   cayó a 0.004 con D(x) ≈ 0.998 y D(G(z)) ≈ 0.002 (D gana y G se queda sin gradiente útil).
+2. **No era un problema de `G.eval()`:** en modo `train` las 16 muestras también eran idénticas. Medido capa por
+   capa, la variación entre muestras se apagaba dentro de G (de 0.99 a 0.02) con los γ de BatchNorm intactos
+   (≈ 1): G aprendió a ignorar z.
+3. **Pruebas cortas de 30 épocas** (`configs/probes/`, todas con fondo blanco salvo donde se indica): SN, hinge,
+   instance noise, dropout en D, etiquetas ruidosas y sus combinaciones **siguieron colapsando**. La receta de la
+   autora del dataset (fondo negro + etiquetas ruidosas + dropout + batch 64) y **solo fondo negro** dieron
+   personajes distintos para cada z.
+4. **Decisión:** el control pasa a ser la DCGAN del tutorial **+ fondo negro** (un solo cambio, en los datos;
+   negro es además el RGB que los PNG guardan bajo los píxeles transparentes). Base, hinge y SN se entrenaron
+   de nuevo desde cero con ese control. Los runs con fondo blanco quedan en Drive en `runs_fondo_blanco/`.
+   No sabemos con certeza *por qué* el fondo blanco provoca el colapso; es un hallazgo empírico.
 
 ## Entrenamiento
 
