@@ -14,6 +14,7 @@ import argparse
 import csv
 import json
 import os
+import shutil
 import time
 from pathlib import Path
 
@@ -36,6 +37,12 @@ def save_checkpoint(path: Path, **state) -> None:
     tmp = path.with_suffix(".tmp")
     torch.save(state, tmp)
     os.replace(tmp, path)
+
+
+def load_checkpoint(path: Path, device) -> dict:
+    # Siempre a CPU: los estados RNG (ByteTensor) deben quedar en CPU o set_rng_state falla en GPU.
+    # load_state_dict copia después los pesos (y el estado de Adam) al dispositivo de cada parámetro.
+    return torch.load(path, map_location="cpu", weights_only=False)
 
 
 @torch.no_grad()
@@ -62,6 +69,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", required=True)
     ap.add_argument("--resume", action="store_true", help="continuar desde checkpoints/last.pt")
+    ap.add_argument("--overwrite", action="store_true", help="borrar el run existente y empezar de cero")
     ap.add_argument("--out-root", default="outputs")
     ap.add_argument("--data-root", default="data")
     # Solo para pruebas / medir tiempo por época. Para los experimentos reales NO usar:
@@ -83,6 +91,14 @@ def main():
     out_root = Path(args.out_root)
     run_dir = out_root / "runs" / cfg["name"]
     ckpt_dir, samples_dir = run_dir / "checkpoints", run_dir / "samples"
+    # Validar antes de crear o escribir nada: un error aquí no debe dejar el run a medias.
+    if args.resume and not (ckpt_dir / "last.pt").exists():
+        raise SystemExit(f"--resume: no existe {ckpt_dir / 'last.pt'} (¿Drive montado? ¿out-root correcto?)")
+    if not args.resume and (ckpt_dir / "last.pt").exists():
+        if not args.overwrite:
+            raise SystemExit(f"{run_dir} ya tiene checkpoints/last.pt. Usa --resume para continuar "
+                             f"o --overwrite para borrarlo y empezar de cero.")
+        shutil.rmtree(run_dir)  # sin restos de la corrida anterior (samples/epoch_XXX viejos, checkpoints)
     ckpt_dir.mkdir(parents=True, exist_ok=True)
     samples_dir.mkdir(parents=True, exist_ok=True)
 
@@ -113,9 +129,7 @@ def main():
     start_epoch, global_iter, epoch_times = 0, 0, []
     csv_path = run_dir / "losses.csv"
     if args.resume:
-        if not (ckpt_dir / "last.pt").exists():
-            raise SystemExit(f"--resume: no existe {ckpt_dir / 'last.pt'} (¿Drive montado? ¿out-root correcto?)")
-        ck = torch.load(ckpt_dir / "last.pt", map_location=device, weights_only=False)
+        ck = load_checkpoint(ckpt_dir / "last.pt", device)
         # Solo se permite cambiar `epochs` al reanudar; cualquier otro cambio mezclaría dos runs distintos.
         changed = {k: v for k, v in diff_configs(cfg, ck["config"]).items() if k != "epochs"}
         if changed:
@@ -173,21 +187,25 @@ def main():
 
         with open(csv_path, "a", newline="") as f:
             csv.writer(f).writerows(rows)
-        epoch_times.append(time.time() - t0)
-        last = rows[-1]
-        print(f"[{epoch:3d}/{cfg['epochs']}] loss_D={last[2]:.3f} loss_G={last[3]:.3f} "
-              f"D(x)={last[4]:.2f} D(G(z))={last[5]:.2f} | {epoch_times[-1]:.1f}s")
 
         is_last = epoch == cfg["epochs"]
         if epoch % cfg["snapshot_every"] == 0 or is_last:
             snapshot(G, fixed_noise, samples_dir / f"epoch_{epoch:03d}.png")
 
-        state = dict(G=G.state_dict(), D=D.state_dict(), optG=optG.state_dict(), optD=optD.state_dict(),
-                     epoch=epoch, global_iter=global_iter, config=cfg, rng=get_rng_state(), loader_rng=loader_gen.get_state(),
-                     epoch_times=epoch_times)
-        save_checkpoint(ckpt_dir / "last.pt", **state)
+        epoch_times.append(time.time() - t0)
+        # last.pt solo cada `ckpt_every` épocas: cada checkpoint pesa ~75 MB y escribirlo en Drive en cada
+        # época cuesta tanto como entrenarla (y puede llenar la cuota). Si Colab se cae se pierden como mucho
+        # ckpt_every-1 épocas; al reanudar, truncate_csv borra las filas de esas épocas.
         if epoch % cfg["ckpt_every"] == 0 or is_last:
+            state = dict(G=G.state_dict(), D=D.state_dict(), optG=optG.state_dict(), optD=optD.state_dict(),
+                         epoch=epoch, global_iter=global_iter, config=cfg, rng=get_rng_state(),
+                         loader_rng=loader_gen.get_state(), epoch_times=epoch_times)
+            save_checkpoint(ckpt_dir / "last.pt", **state)
             save_checkpoint(ckpt_dir / f"epoch_{epoch:03d}.pt", **state)
+        epoch_times[-1] = time.time() - t0  # el tiempo por época incluye guardar en Drive
+        last = rows[-1]
+        print(f"[{epoch:3d}/{cfg['epochs']}] loss_D={last[2]:.3f} loss_G={last[3]:.3f} "
+              f"D(x)={last[4]:.2f} D(G(z))={last[5]:.2f} | {epoch_times[-1]:.1f}s")
 
     # ------------------------------------------------------------ resúmenes del run
     snapshot(G, fixed_noise, run_dir / "fixed_grid.png")

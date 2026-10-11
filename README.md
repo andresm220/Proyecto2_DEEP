@@ -75,9 +75,12 @@ Cada run deja en `outputs/runs/<name>/`: `checkpoints/epoch_XXX.pt` y `last.pt`,
 (rejilla de ruido fijo), `losses.csv` (`epoch, iter, loss_D, loss_G, D_x, D_G_z`), `fixed_grid.png`,
 `losses.png`, `progress.png`, `config.yaml` y `train_log.json`.
 
-`--resume` reproduce exactamente el mismo entrenamiento que una corrida sin interrupciones: se guardan los estados
-del optimizador y de todos los generadores de números aleatorios. Si la config cambió respecto al checkpoint
-(salvo `epochs`), se niega a continuar.
+`--resume` continúa desde `last.pt` (que se guarda cada `ckpt_every` épocas) con los estados del optimizador y de
+todos los generadores de números aleatorios. En CPU reproduce **exactamente** una corrida sin interrupciones
+(lo verifica `tests/test_train.py`); en GPU queda muy cerca pero no idéntica, porque ConvTranspose en cuDNN no es
+determinista bit a bit. Si la config cambió respecto al checkpoint (salvo `epochs`), se niega a continuar.
+Correr de nuevo un run que ya tiene `last.pt` sin `--resume` falla a propósito, para no borrar un run terminado;
+para empezar de cero hay que pasar `--overwrite`.
 
 Comparar runs:
 
@@ -97,6 +100,9 @@ python -m src.gallery --regenerate --weights <ruta a los pesos finales> --seeds 
   personaje queda identificado por un entero.
 - **Tasa de selección:** 10 de 200. El criterio de selección (k-means sobre features más revisión visual) está en
   `galeria/seeds.json` y en la presentación.
+- **La galería se genera en CPU y de a una muestra (batch 1)**, tanto al seleccionar como al regenerar. En GPU,
+  cuDNN puede elegir algoritmos distintos según el tamaño del batch, y una diferencia de 1e-6 basta para cambiar
+  algún píxel al redondear a 0–255. En CPU y con batch 1, la regeneración es exacta píxel a píxel.
 - **Siempre `G.eval()`.** En modo `eval`, BatchNorm usa las estadísticas acumuladas durante el entrenamiento, así que
   una misma `z` produce siempre la misma imagen, sin importar con qué otras `z` vaya en el batch. En modo `train`,
   BatchNorm normaliza con las estadísticas del batch actual y la imagen cambia. Por eso hay que usar el mismo modo

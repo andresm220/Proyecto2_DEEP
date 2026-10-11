@@ -27,3 +27,11 @@ def test_fixed_noise_matches_contract(tmp_path):
     z = get_fixed_noise(tmp_path / "fixed_noise.pt")
     assert torch.equal(z, expected)
     assert torch.equal(get_fixed_noise(tmp_path / "fixed_noise.pt"), expected)  # recarga desde disco
+
+
+def test_fixed_noise_rejects_file_with_wrong_values(tmp_path):
+    # P. ej. alguien lo creó con torch.randn(..., device="cuda"): misma forma, otros valores.
+    import pytest
+    torch.save(torch.zeros(16, 100, 1, 1), tmp_path / "fixed_noise.pt")
+    with pytest.raises(ValueError):
+        get_fixed_noise(tmp_path / "fixed_noise.pt")

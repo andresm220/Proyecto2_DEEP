@@ -70,12 +70,16 @@ def get_fixed_noise(path, n: int = 16, nz: int = 100, seed: int = 1234) -> torch
     Usa un generador local con la semilla del contrato: da exactamente los mismos valores que
     `torch.manual_seed(1234); torch.randn(16, 100, 1, 1)` pero sin tocar el RNG global."""
     path = Path(path)
-    if path.exists():
-        z = torch.load(path)
-        assert z.shape == (n, nz, 1, 1), f"fixed_noise.pt tiene forma {tuple(z.shape)}"
-        return z
     g = torch.Generator().manual_seed(seed)
     z = torch.randn(n, nz, 1, 1, generator=g)
+    if path.exists():
+        # Verificar contra el contrato: un archivo hecho de otra forma (p. ej. con randn en CUDA) tendría la
+        # misma forma pero otros valores, y las rejillas de distintos runs dejarían de ser comparables.
+        loaded = torch.load(path)
+        if loaded.shape != z.shape or not torch.equal(loaded, z):
+            raise ValueError(f"{path} no coincide con torch.manual_seed({seed}); torch.randn({n}, {nz}, 1, 1). "
+                             f"Bórralo para regenerarlo o copia el de Persona A.")
+        return z
     path.parent.mkdir(parents=True, exist_ok=True)
     torch.save(z, path)
     return z
