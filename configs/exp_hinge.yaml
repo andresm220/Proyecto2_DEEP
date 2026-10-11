@@ -1,0 +1,4 @@
+# Experimento de PÉRDIDA (Persona A). Cambio único respecto a base: loss.
+inherit: base.yaml
+name: exp_hinge
+loss: hinge

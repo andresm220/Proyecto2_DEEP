@@ -1,0 +1,21 @@
+# Configuración BASE = el CONTROL de todos los experimentos.
+# Los experimentos heredan de este archivo (clave `inherit`) y cambian UNA sola clave,
+# así la diferencia con el control queda explícita en el propio YAML.
+name: base
+seed: 42
+image_size: 64
+nz: 100
+ngf: 64
+ndf: 64
+batch_size: 128
+epochs: 100            # ajustar tras medir tiempo/época; MISMO valor en todos los experimentos
+lr_g: 0.0002
+lr_d: 0.0002
+betas: [0.5, 0.999]
+loss: bce_nonsat       # BCE con pérdida no saturante para G
+spectral_norm_d: false
+augment_hflip: true
+fixed_noise_seed: 1234 # 16 vectores z fijos para la rejilla
+n_fixed: 16
+snapshot_every: 5      # épocas entre snapshots de la rejilla fija
+ckpt_every: 5

@@ -1,0 +1,4 @@
+# Experimento de ESTABILIZACIÓN (Persona B). Cambio único respecto a base: spectral_norm_d.
+inherit: base.yaml
+name: exp_sn
+spectral_norm_d: true
