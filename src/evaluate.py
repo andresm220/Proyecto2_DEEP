@@ -16,7 +16,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from .data import VIEW_NAMES, TinyHero
+from .data import BACKGROUNDS, VIEW_NAMES, TinyHero
 from .models import Generator
 
 IMAGENET_MEAN = torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1)
@@ -69,9 +69,6 @@ class FeatureExtractor:
             x = (x - IMAGENET_MEAN.to(self.device)) / IMAGENET_STD.to(self.device)
             feats.append(self.model(x).cpu())
         return torch.cat(feats)
-
-
-BACKGROUNDS = {"white": (255, 255, 255), "black": (0, 0, 0)}
 
 
 def train_dataset_for(cfg: dict, data_root: str) -> TinyHero:
