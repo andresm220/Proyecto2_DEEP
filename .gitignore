@@ -10,3 +10,6 @@ __pycache__/
 
 # Espacio de trabajo local de los planes
 .superpowers/
+
+# Especificación privada del equipo (no se publica)
+proyecto2_gan_plan.md
