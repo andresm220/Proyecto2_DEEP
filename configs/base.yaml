@@ -15,6 +15,9 @@ betas: [0.5, 0.999]
 loss: bce_nonsat       # BCE con pérdida no saturante para G
 spectral_norm_d: false
 augment_hflip: true
+background: black      # fondo negro: con fondo blanco G colapsaba a un solo personaje en TODAS las
+                       # configuraciones (base, hinge, SN, dropout, instance noise, label noise). Ver diapositiva 8 y
+                       # configs/probes/. Negro es además el RGB que guardan los PNG bajo los píxeles transparentes.
 fixed_noise_seed: 1234 # 16 vectores z fijos para la rejilla
 n_fixed: 16
 snapshot_every: 10     # épocas entre snapshots de la rejilla fija (25 snapshots)
