@@ -1,0 +1,21 @@
+name: exp_hinge
+seed: 42
+image_size: 64
+nz: 100
+ngf: 64
+ndf: 64
+batch_size: 128
+epochs: 250
+lr_g: 0.0002
+lr_d: 0.0002
+betas:
+- 0.5
+- 0.999
+loss: hinge
+spectral_norm_d: false
+augment_hflip: true
+background: black
+fixed_noise_seed: 1234
+n_fixed: 16
+snapshot_every: 10
+ckpt_every: 25

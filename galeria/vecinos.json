@@ -1,0 +1,312 @@
+{
+  "personaje_00.png": {
+    "seed": 64,
+    "coseno": [
+      {
+        "vecino": "personaje 251 (derecha)",
+        "sim": 0.9005
+      },
+      {
+        "vecino": "personaje 251 (izquierda)",
+        "sim": 0.89
+      },
+      {
+        "vecino": "personaje 783 (frente)",
+        "sim": 0.8899
+      }
+    ],
+    "pixeles": [
+      {
+        "vecino": "personaje 479 (espalda)",
+        "rmse": 0.116
+      },
+      {
+        "vecino": "personaje 644 (espalda)",
+        "rmse": 0.1171
+      },
+      {
+        "vecino": "personaje 389 (espalda)",
+        "rmse": 0.1174
+      }
+    ]
+  },
+  "personaje_01.png": {
+    "seed": 114,
+    "coseno": [
+      {
+        "vecino": "personaje 162 (derecha)",
+        "sim": 0.8583
+      },
+      {
+        "vecino": "personaje 177 (frente)",
+        "sim": 0.8538
+      },
+      {
+        "vecino": "personaje 480 (derecha)",
+        "sim": 0.8533
+      }
+    ],
+    "pixeles": [
+      {
+        "vecino": "personaje 789 (frente)",
+        "rmse": 0.141
+      },
+      {
+        "vecino": "personaje 102 (frente)",
+        "rmse": 0.1411
+      },
+      {
+        "vecino": "personaje 369 (frente)",
+        "rmse": 0.1425
+      }
+    ]
+  },
+  "personaje_02.png": {
+    "seed": 132,
+    "coseno": [
+      {
+        "vecino": "personaje 418 (derecha)",
+        "sim": 0.8784
+      },
+      {
+        "vecino": "personaje 112 (frente)",
+        "sim": 0.8774
+      },
+      {
+        "vecino": "personaje 716 (derecha)",
+        "sim": 0.8773
+      }
+    ],
+    "pixeles": [
+      {
+        "vecino": "personaje 209 (derecha)",
+        "rmse": 0.09
+      },
+      {
+        "vecino": "personaje 743 (derecha)",
+        "rmse": 0.0907
+      },
+      {
+        "vecino": "personaje 845 (derecha)",
+        "rmse": 0.0918
+      }
+    ]
+  },
+  "personaje_03.png": {
+    "seed": 190,
+    "coseno": [
+      {
+        "vecino": "personaje 562 (izquierda)",
+        "sim": 0.8559
+      },
+      {
+        "vecino": "personaje 251 (derecha)",
+        "sim": 0.8541
+      },
+      {
+        "vecino": "personaje 177 (frente)",
+        "sim": 0.8492
+      }
+    ],
+    "pixeles": [
+      {
+        "vecino": "personaje 657 (izquierda)",
+        "rmse": 0.1022
+      },
+      {
+        "vecino": "personaje 866 (izquierda)",
+        "rmse": 0.1067
+      },
+      {
+        "vecino": "personaje 641 (izquierda)",
+        "rmse": 0.1082
+      }
+    ]
+  },
+  "personaje_04.png": {
+    "seed": 97,
+    "coseno": [
+      {
+        "vecino": "personaje 676 (frente)",
+        "sim": 0.8673
+      },
+      {
+        "vecino": "personaje 835 (frente)",
+        "sim": 0.8554
+      },
+      {
+        "vecino": "personaje 177 (frente)",
+        "sim": 0.8546
+      }
+    ],
+    "pixeles": [
+      {
+        "vecino": "personaje 81 (frente)",
+        "rmse": 0.1192
+      },
+      {
+        "vecino": "personaje 191 (frente)",
+        "rmse": 0.1277
+      },
+      {
+        "vecino": "personaje 140 (frente)",
+        "rmse": 0.1303
+      }
+    ]
+  },
+  "personaje_05.png": {
+    "seed": 188,
+    "coseno": [
+      {
+        "vecino": "personaje 151 (frente)",
+        "sim": 0.8828
+      },
+      {
+        "vecino": "personaje 151 (izquierda)",
+        "sim": 0.8808
+      },
+      {
+        "vecino": "personaje 352 (derecha)",
+        "sim": 0.8763
+      }
+    ],
+    "pixeles": [
+      {
+        "vecino": "personaje 14 (izquierda)",
+        "rmse": 0.0985
+      },
+      {
+        "vecino": "personaje 674 (izquierda)",
+        "rmse": 0.1003
+      },
+      {
+        "vecino": "personaje 597 (izquierda)",
+        "rmse": 0.1026
+      }
+    ]
+  },
+  "personaje_06.png": {
+    "seed": 83,
+    "coseno": [
+      {
+        "vecino": "personaje 251 (derecha)",
+        "sim": 0.8618
+      },
+      {
+        "vecino": "personaje 167 (derecha)",
+        "sim": 0.8582
+      },
+      {
+        "vecino": "personaje 122 (derecha)",
+        "sim": 0.857
+      }
+    ],
+    "pixeles": [
+      {
+        "vecino": "personaje 57 (derecha)",
+        "rmse": 0.1072
+      },
+      {
+        "vecino": "personaje 484 (derecha)",
+        "rmse": 0.1107
+      },
+      {
+        "vecino": "personaje 209 (derecha)",
+        "rmse": 0.1112
+      }
+    ]
+  },
+  "personaje_07.png": {
+    "seed": 53,
+    "coseno": [
+      {
+        "vecino": "personaje 589 (frente)",
+        "sim": 0.8681
+      },
+      {
+        "vecino": "personaje 578 (frente)",
+        "sim": 0.8613
+      },
+      {
+        "vecino": "personaje 151 (frente)",
+        "sim": 0.8613
+      }
+    ],
+    "pixeles": [
+      {
+        "vecino": "personaje 329 (izquierda)",
+        "rmse": 0.1329
+      },
+      {
+        "vecino": "personaje 899 (izquierda)",
+        "rmse": 0.1351
+      },
+      {
+        "vecino": "personaje 31 (izquierda)",
+        "rmse": 0.1369
+      }
+    ]
+  },
+  "personaje_08.png": {
+    "seed": 112,
+    "coseno": [
+      {
+        "vecino": "personaje 177 (frente)",
+        "sim": 0.8738
+      },
+      {
+        "vecino": "personaje 628 (derecha)",
+        "sim": 0.8627
+      },
+      {
+        "vecino": "personaje 898 (derecha)",
+        "sim": 0.8622
+      }
+    ],
+    "pixeles": [
+      {
+        "vecino": "personaje 789 (frente)",
+        "rmse": 0.1251
+      },
+      {
+        "vecino": "personaje 570 (frente)",
+        "rmse": 0.1292
+      },
+      {
+        "vecino": "personaje 369 (frente)",
+        "rmse": 0.1295
+      }
+    ]
+  },
+  "personaje_09.png": {
+    "seed": 138,
+    "coseno": [
+      {
+        "vecino": "personaje 151 (izquierda)",
+        "sim": 0.8539
+      },
+      {
+        "vecino": "personaje 589 (frente)",
+        "sim": 0.8467
+      },
+      {
+        "vecino": "personaje 177 (frente)",
+        "sim": 0.8436
+      }
+    ],
+    "pixeles": [
+      {
+        "vecino": "personaje 849 (izquierda)",
+        "rmse": 0.1164
+      },
+      {
+        "vecino": "personaje 680 (izquierda)",
+        "rmse": 0.121
+      },
+      {
+        "vecino": "personaje 259 (izquierda)",
+        "rmse": 0.1248
+      }
+    ]
+  }
+}

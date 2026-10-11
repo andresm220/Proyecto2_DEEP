@@ -1,0 +1,91 @@
+{
+  "weights_file": "G_final.pt",
+  "weights_sha256": "8c804aa04d3ec0c8d72555b97f729b92ea6f2606228c90ce557b2feef3c36fca",
+  "generacion": "G.eval(), CPU, float64; z_i = torch.randn(1, nz, 1, 1, generator=torch.Generator().manual_seed(seed)), guardados en z_vectors.pt (fuente de verdad al regenerar)",
+  "n_candidates": 200,
+  "seeds_candidatos": "0-199",
+  "tasa_seleccion": "10 de 200",
+  "criterio": "k-means (k=10, random_state=42) sobre features ResNet-18 (normalizadas) de los candidatos; de cada cluster se eligió por revisión visual la muestra más legible según la vara del universo (figura humanoide completa, atuendo coherente con una clase del reino, distinta de las otras 9). Por defecto, la más cercana al centroide.",
+  "characters": [
+    {
+      "file": "personaje_00.png",
+      "file_256": "personaje_00_256.png",
+      "seed": 64,
+      "cluster": 0,
+      "nombre": "Tohil, Guardabosques del Cerro",
+      "clase": "explorador"
+    },
+    {
+      "file": "personaje_01.png",
+      "file_256": "personaje_01_256.png",
+      "seed": 114,
+      "cluster": 1,
+      "nombre": "Ixkik, la Espada Carmesí",
+      "clase": "guerrera"
+    },
+    {
+      "file": "personaje_02.png",
+      "file_256": "personaje_02_256.png",
+      "seed": 132,
+      "cluster": 2,
+      "nombre": "Balam el Buhonero",
+      "clase": "mercader errante"
+    },
+    {
+      "file": "personaje_03.png",
+      "file_256": "personaje_03_256.png",
+      "seed": 190,
+      "cluster": 3,
+      "nombre": "Kukul, Arquero del Paso",
+      "clase": "explorador"
+    },
+    {
+      "file": "personaje_04.png",
+      "file_256": "personaje_04_256.png",
+      "seed": 97,
+      "cluster": 4,
+      "nombre": "Itzam, Sabio de Ceniza",
+      "clase": "mago"
+    },
+    {
+      "file": "personaje_05.png",
+      "file_256": "personaje_05_256.png",
+      "seed": 188,
+      "cluster": 5,
+      "nombre": "Gorrak el Desterrado",
+      "clase": "guerrero orco"
+    },
+    {
+      "file": "personaje_06.png",
+      "file_256": "personaje_06_256.png",
+      "seed": 83,
+      "cluster": 6,
+      "nombre": "Chak, Aprendiz de Herrero",
+      "clase": "gente del reino"
+    },
+    {
+      "file": "personaje_07.png",
+      "file_256": "personaje_07_256.png",
+      "seed": 53,
+      "cluster": 7,
+      "nombre": "Ixchel, Hechicera Índigo",
+      "clase": "maga"
+    },
+    {
+      "file": "personaje_08.png",
+      "file_256": "personaje_08_256.png",
+      "seed": 112,
+      "cluster": 8,
+      "nombre": "Hunab, Mercenario Rojo",
+      "clase": "guerrero"
+    },
+    {
+      "file": "personaje_09.png",
+      "file_256": "personaje_09_256.png",
+      "seed": 138,
+      "cluster": 9,
+      "nombre": "Xquic, Vidente de la Niebla",
+      "clase": "maga"
+    }
+  ]
+}

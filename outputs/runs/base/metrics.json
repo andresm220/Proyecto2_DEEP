@@ -1,0 +1,14 @@
+{
+  "run": "base",
+  "checkpoint": "last.pt",
+  "epoch": 250,
+  "n_samples": 500,
+  "seeds": "0-499",
+  "diversity": 0.1017003208398819,
+  "train_diversity": 0.18847131729125977,
+  "novelty": 0.17098596692085266,
+  "novelty_p05": 0.1486763209104538,
+  "novelty_min": 0.13500118255615234,
+  "features": "ResNet-18 ImageNet avgpool 512-d, 64->224 NEAREST",
+  "distance": "coseno"
+}

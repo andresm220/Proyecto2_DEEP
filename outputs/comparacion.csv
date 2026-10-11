@@ -1,0 +1,4 @@
+run,loss,spectral_norm_d,epochs,diversity,train_diversity,novelty,novelty_p05,loss_D_ult_epoca,loss_G_ult_epoca,D_x_ult_epoca,D_G_z_ult_epoca
+base,bce_nonsat,False,250,0.1017,0.1885,0.171,0.1487,0.0959,7.2554,0.967,0.035
+exp_hinge,hinge,False,250,0.1038,0.1885,0.1406,0.1175,0.1768,5.6206,0.923,0.0739
+exp_sn,bce_nonsat,True,250,0.0899,0.1885,0.1363,0.1129,0.0454,5.2756,0.9787,0.022
