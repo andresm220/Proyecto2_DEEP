@@ -142,8 +142,8 @@ display(Image(f'{OUT}/figs/cmp_base_vs_sn_curves.png'))"""),
 **Decisión S2 (con `comparacion.csv`):** el modelo final es **hinge solo, 500 épocas** (`configs/final.yaml`).
 Hinge fue el único cambio que mejoró algo (nitidez, D menos dominante, diversidad +2 %); SN empeoró la diversidad,
 así que no lo combinamos. Duplicamos las épocas porque las curvas de hinge seguían estables a las 250."""),
-    code("""entrenar('configs/final.yaml', 'final')
-for f in ['fixed_grid.png', 'progress.png', 'losses.png']:
+    code("""entrenar('configs/final.yaml', 'final')"""),
+    code("""for f in ['fixed_grid.png', 'progress.png', 'losses.png']:
     display(Image(f'{OUT}/runs/final/{f}'))"""),
     md("""**Lectura del modelo final:**
 
