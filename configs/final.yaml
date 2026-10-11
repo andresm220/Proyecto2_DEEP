@@ -1,0 +1,10 @@
+# Modelo FINAL: genera la galería. Decisión S2 (comparacion.csv, 250 épocas cada uno):
+#   hinge: diversidad 0.104 vs 0.102 de base, D menos dominante (D(G(z)) 0.074 vs 0.035), siluetas más nítidas.
+#   SN:    diversidad 0.090 (-12%) y D más dominante -> se descarta; NO se combina hinge + SN.
+# Mismo control (fondo negro, semilla, ruido fijo); se entrena 2x las épocas de base.
+inherit: base.yaml
+name: final
+loss: hinge
+epochs: 500
+snapshot_every: 20     # 25 snapshots para la evolución (diapositiva 6)
+ckpt_every: 50         # 10 checkpoints: permite evaluar épocas intermedias si la última colapsa
