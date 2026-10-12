@@ -179,6 +179,6 @@ dataset: comparten color de pelo o paleta, no el personaje completo.
 
 ## Declaración de uso de IA
 
-Se usó Claude para planificar y estructurar el proyecto, y Claude Code para escribir y depurar el código. El equipo
+Se usó Claude para planificar y estructurar el proyecto, y Claude Code para complementar y depurar el código. El equipo
 revisó, entendió y verificó el código y los resultados. Ninguna imagen de la galería proviene de un generador
 externo: todas salen del generador DCGAN entrenado por nosotros.
