@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Los Errantes de Kaminal</title>
+<!-- Fuente de presentacion.pdf. Regenerar (Windows, desde la raíz del repo):
+     msedge --headless --disable-gpu --no-pdf-header-footer --print-to-pdf=presentacion.pdf docs/presentacion.html -->
+<style>
+  @page { size: 13.333in 7.5in; margin: 0; }
+  :root { --bg: #fbfaf7; --ink: #17181c; --muted: #6b6e76; --line: #e3e1db;
+          --accent: #b4532a; --good: #2f7d5b; --bad: #c0392b; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .slide { width: 1280px; height: 720px; padding: 44px 56px 36px; position: relative;
+    display: flex; flex-direction: column; gap: 18px; overflow: hidden; page-break-after: always; }
+  .slide:last-child { page-break-after: auto; }
+  .num { position: absolute; right: 56px; bottom: 18px; font-size: 13px; color: var(--muted); }
+  .kicker { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  h1 { font-size: 36px; font-weight: 700; line-height: 1.12; letter-spacing: -.01em; margin-top: -8px; }
+  p, li { font-size: 19px; line-height: 1.4; }
+  ul { list-style: none; } li { padding-left: 18px; position: relative; margin-bottom: 10px; }
+  li::before { content: ""; position: absolute; left: 0; top: .62em; width: 7px; height: 7px; background: var(--accent); }
+  code { font-family: Consolas, monospace; font-size: .85em; }
+  .row { display: flex; gap: 40px; flex: 1; min-height: 0; align-items: center; }
+  .col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  img { display: block; max-width: 100%; max-height: 100%; }
+  .cap { font-size: 13px; color: var(--muted); }
+  .label { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+  .stat .v { font-size: 46px; font-weight: 700; line-height: 1; }
+  .stat .k { font-size: 15px; color: var(--muted); margin-top: 4px; }
+  .good { color: var(--good); } .bad { color: var(--bad); }
+  .hyp { font-size: 16px; color: var(--muted); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 10px 0; }
+  .hyp b { color: var(--ink); }
+  .take { font-size: 21px; font-weight: 600; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); font-size: 16px; vertical-align: top; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  /* diagrama de arquitectura */
+  .flow { display: flex; align-items: center; gap: 14px; }
+  .box { border: 1.5px solid var(--ink); border-radius: 8px; padding: 14px 18px; text-align: center; font-size: 18px; font-weight: 600; background: #fff; }
+  .box small { display: block; font-size: 13px; font-weight: 400; color: var(--muted); margin-top: 3px; }
+  .arrow { font-size: 26px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- 1 -->
+<section class="slide">
+  <div class="kicker">Proyecto 2 · Deep Learning 2026 · UVG</div>
+  <h1 style="font-size:52px">Los Errantes de Kaminal</h1>
+  <p style="color:var(--muted);margin-top:-10px">Andrés Mazariegos · June Herrera</p>
+  <div class="row">
+    <div class="col" style="flex:1">
+      <p>Un reino de fantasía medieval en <b>pixel art RPG de 16 bits</b>: guerreros, magos, exploradores y gente común, de noche (fondo negro).</p>
+      <div>
+        <div class="label">Un personaje cuenta si</div>
+        <ul>
+          <li>se lee como figura humanoide completa</li>
+          <li>su ropa encaja con una clase del reino</li>
+          <li>es distinto de los otros 9</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col" style="flex:1.5"><img src="../galeria/galeria.png" alt="Los 10 personajes"></div>
+  </div>
+  <div class="num">1</div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="kicker">Datos</div>
+  <h1>TinyHero: sprites LPC de 64×64</h1>
+  <div class="row">
+    <div class="col" style="flex:1;gap:26px">
+      <div style="display:flex;gap:40px">
+        <div class="stat"><div class="v">3 648</div><div class="k">imágenes</div></div>
+        <div class="stat"><div class="v">912</div><div class="k">personajes × 4 vistas</div></div>
+      </div>
+      <div>
+        <div class="label">Origen y licencia</div>
+        <p>TinyHero (A. Mikołajczyk), hecho con el generador LPC. <b>CC-BY-SA 3.0 / GPL 3.0</b>.</p>
+      </div>
+      <div>
+        <div class="label">Preparación</div>
+        <p>RGBA → <b>fondo negro</b> → [−1, 1] → flip horizontal</p>
+        <p class="cap" style="margin-top:4px">Sin recorte ni cambio de tamaño · batch 128</p>
+      </div>
+    </div>
+    <div class="col" style="flex:1;align-items:center"><img src="../outputs/figs/muestras_dataset.png" alt="64 imágenes reales" style="max-height:560px"></div>
+  </div>
+  <div class="num">2</div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="kicker">Arquitectura</div>
+  <h1>DCGAN: la más simple que funciona en 64×64</h1>
+  <div class="col" style="flex:1;justify-content:center;gap:40px">
+    <div class="flow" style="justify-content:center">
+      <div class="box">z<small>100 números</small></div><div class="arrow">→</div>
+      <div class="box">Generador<small>ConvTranspose · 3.6 M</small></div><div class="arrow">→</div>
+      <div class="box" style="background:#17181c;color:#fff">imagen<small style="color:#bbb">64×64</small></div><div class="arrow">→</div>
+      <div class="box">Discriminador<small>Conv · 2.8 M</small></div><div class="arrow">→</div>
+      <div class="box">¿real o falsa?</div>
+    </div>
+    <div style="display:flex;gap:60px;justify-content:center">
+      <div style="max-width:470px">
+        <div class="label">Por qué</div>
+        <p>Es la del tutorial de PyTorch: la entendemos línea por línea y entrena en ~24 min en una T4.</p>
+      </div>
+      <div style="max-width:470px">
+        <div class="label">Control (lo que no cambia)</div>
+        <p>Semilla 42 · Adam 2e-4 · BCE no saturante · 250 épocas · ruido fijo 1234</p>
+      </div>
+    </div>
+  </div>
+  <div class="num">3</div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <div class="kicker">Experimento de pérdida · un solo cambio: <code>loss: hinge</code></div>
+  <h1>Hinge: más nítido, casi igual de diverso</h1>
+  <p class="hyp"><b>Hipótesis (antes de entrenar):</b> hinge mejorará la estabilidad y la diversidad porque no satura cuando D está seguro.
+  Útil si hay menos filas repetidas y la diversidad sube.</p>
+  <div class="row">
+    <div class="col" style="flex:2.2"><img src="../outputs/figs/cmp_todos_grids.png" alt="Rejillas base, hinge, SN"></div>
+    <div class="col" style="flex:1;gap:22px">
+      <div class="stat"><div class="v good">+2 %</div><div class="k">diversidad (0.102 → 0.104)</div></div>
+      <div class="stat"><div class="v">0.035 → 0.074</div><div class="k">D(G(z)): D domina menos</div></div>
+      <p class="take">Se cumple a medias → el modelo final usa hinge.</p>
+    </div>
+  </div>
+  <div class="num">4</div>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <div class="kicker">Experimento de estabilización · un solo cambio: <code>spectral_norm_d: true</code></div>
+  <h1>Normalización espectral en D: empeoró</h1>
+  <p class="hyp"><b>Hipótesis (antes de entrenar):</b> SN mejorará la estabilidad porque limita a D y G no se queda sin gradiente.
+  Útil si la pérdida de D no colapsa a ~0 y la diversidad no baja.</p>
+  <img src="../outputs/figs/cmp_todos_curves.png" alt="Curvas base, hinge, SN" style="max-height:230px;align-self:center">
+  <div style="display:flex;gap:60px;align-items:flex-end">
+    <div class="stat"><div class="v bad">−12 %</div><div class="k">diversidad (0.102 → 0.090)</div></div>
+    <div class="stat"><div class="v bad">0.022</div><div class="k">D(G(z)): D domina más</div></div>
+    <p class="take" style="flex:1">Refutada. Probable causa: dejamos BatchNorm en D (para cambiar una sola cosa) y anula a SN.</p>
+  </div>
+  <div class="num">5</div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <div class="kicker">Evidencia 1 · rejilla de ruido fijo</div>
+  <h1>Los mismos 16 z durante 500 épocas: cada uno conserva su personaje</h1>
+  <div class="row">
+    <div class="col" style="flex:1.6;align-items:center"><img src="progress_final_2filas.png" alt="Evolución de la rejilla del modelo final"></div>
+    <div class="col" style="flex:1">
+      <ul>
+        <li>Época 0: ruido.</li>
+        <li>Época 100: ya hay 16 personajes distintos.</li>
+        <li>Hasta la 500 se afinan siluetas y colores.</li>
+      </ul>
+      <p class="take">Ni colapso total ni divergencia.</p>
+      <p class="cap" style="font-size:15px">Sí colapso parcial: muchos comparten color de pelo.</p>
+    </div>
+  </div>
+  <div class="num">6</div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <div class="kicker">Evidencia 2 · curvas de pérdida</div>
+  <h1>Estable, pero D gana terreno poco a poco</h1>
+  <div class="row">
+    <div class="col" style="flex:1.7"><img src="../outputs/runs/final/losses.png" alt="Pérdidas del modelo final"></div>
+    <div class="col" style="flex:1">
+      <ul>
+        <li>Desde ~1 000 iteraciones: <b>sin divergencia</b>.</li>
+        <li>D(x) 0.80 → 0.96 y D(G(z)) 0.20 → 0.05.</li>
+        <li>Deriva lenta, no el desplome del run con fondo blanco (D(G(z)) = 0.002).</li>
+      </ul>
+      <p class="take">D cada vez más fuerte = pocos modos en la galería.</p>
+    </div>
+  </div>
+  <div class="num">7</div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <div class="kicker">Problemas encontrados</div>
+  <h1>Con fondo blanco, los 16 z daban el mismo personaje</h1>
+  <div class="row">
+    <div class="col" style="flex:1.6;align-items:center"><img src="progress_blanco_2filas.png" alt="Base con fondo blanco: colapso y divergencia"></div>
+    <div class="col" style="flex:1;gap:22px">
+      <div><div class="label">Qué pasaba</div><p>G aprendió a ignorar z y tras la época 60 divergió a ruido.</p></div>
+      <div><div class="label">Qué probamos</div><p>SN, hinge, ruido, dropout, etiquetas ruidosas: <span class="bad">nada</span>.</p></div>
+      <div><div class="label">Qué funcionó</div><p><span class="good"><b>Fondo negro.</b></span> Lo hicimos el nuevo control y re-entrenamos todo.</p></div>
+    </div>
+  </div>
+  <div class="num">8</div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <div class="kicker">Galería</div>
+  <h1>10 errantes, con nombre y clase</h1>
+  <div class="row">
+    <div class="col" style="flex:3"><img src="../galeria/galeria.png" alt="Los 10 personajes"></div>
+    <div class="col" style="flex:1;gap:24px">
+      <div class="stat"><div class="v">10 de 200</div><div class="k">tasa de selección</div></div>
+      <p style="font-size:16px">k-means (k = 10) sobre features ResNet-18 + revisión visual: uno por cluster.</p>
+      <p style="font-size:16px">Se regenera píxel a píxel:<br><code>python -m src.gallery --regenerate</code></p>
+    </div>
+  </div>
+  <div class="num">9</div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <div class="kicker">Evidencia 3 · vecinos más cercanos</div>
+  <h1>Ninguno es copia: se parecen en el pelo, no en el personaje</h1>
+  <div class="row">
+    <div class="col" style="flex:2.3"><img src="vecinos_2col.png" alt="Top-3 vecinos de cada personaje"></div>
+    <div class="col" style="flex:1;gap:22px">
+      <div class="stat"><div class="v">0.84–0.90</div><div class="k">similitud con el vecino más cercano (ResNet-18)</div></div>
+      <p>La GAN <b>recombina piezas</b>: pelo de uno, cuerpo y ropa de otro.</p>
+      <p class="cap">Ojo: cada personaje real aparece en 4 vistas, y ResNet-18 se fija mucho en el color.</p>
+    </div>
+  </div>
+  <div class="num">10</div>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <div class="kicker">Conclusiones y reflexión final</div>
+  <h1>El fondo pesó más que la pérdida</h1>
+  <div class="row" style="align-items:flex-start">
+    <div class="col" style="flex:1">
+      <div class="label">Conclusiones</div>
+      <ul>
+        <li>Fondo blanco = colapso; fondo negro lo resolvió.</li>
+        <li>Hinge ayudó poco (+2 %); SN empeoró (−12 %).</li>
+        <li>Galería reproducible en otra máquina.</li>
+      </ul>
+      <div class="label" style="margin-top:8px">Limitaciones</div>
+      <ul>
+        <li>Un run por configuración.</li>
+        <li>Diversidad 0.10 vs 0.19 del dataset: colapso parcial.</li>
+        <li>ResNet-18 no es juez ideal de pixel art.</li>
+      </ul>
+    </div>
+    <div class="col" style="flex:1.15">
+      <div class="label">¿Cuál costó más defender como nuevo?</div>
+      <img src="vecinos_tohil.png" alt="Tohil y sus 3 vecinos">
+      <p><b>Tohil (personaje_00):</b> su vecino, el personaje 251 (sim 0.90), aparece en dos vistas.</p>
+      <p class="take">La GAN no inventa desde cero: recombina las piezas del generador LPC, con pocos modos.</p>
+    </div>
+  </div>
+  <div class="num">11</div>
+</section>
+
+<!-- 12 -->
+<section class="slide">
+  <div class="kicker">Matriz de evidencias</div>
+  <h1>Qué demuestra cada evidencia</h1>
+  <table>
+    <tr><th style="width:24%">Evidencia</th><th style="width:8%">Diap.</th><th>Conclusión</th><th style="width:32%">Limitación</th></tr>
+    <tr><td>Rejillas base / hinge / SN</td><td>4–5</td><td>Hinge más nítido; SN no ayuda</td><td>Una rejilla de 16 z por run</td></tr>
+    <tr><td>Diversidad y novedad</td><td>4–5</td><td>Hinge +2 %; SN −12 %</td><td>ResNet-18 no es juez ideal; un run por config.</td></tr>
+    <tr><td>Rejilla del modelo final</td><td>6</td><td>Sin colapso total ni divergencia en 500 épocas</td><td>16 z no muestran el colapso parcial</td></tr>
+    <tr><td>Curvas de pérdida</td><td>5, 7</td><td>Estable; D gana terreno poco a poco</td><td>BCE y hinge en escalas distintas</td></tr>
+    <tr><td>Pruebas con fondo blanco</td><td>8</td><td>El fondo blanco provoca el colapso</td><td>Hallazgo empírico, sin causa probada</td></tr>
+    <tr><td>Galería + tasa de selección</td><td>9</td><td>10 de 200, distintos y con nombre y clase</td><td>Pares parecidos: 02/06, 01/08, 07/09</td></tr>
+    <tr><td>Vecinos más cercanos</td><td>10</td><td>Ninguna copia (sim ≤ 0.90)</td><td>4 vistas por personaje; ResNet-18 prioriza color</td></tr>
+    <tr><td>Regeneración exacta</td><td>9</td><td>Galería idéntica píxel a píxel</td><td>En CPU, float64</td></tr>
+  </table>
+  <div class="num">12</div>
+</section>
+
+</body>
+</html>
